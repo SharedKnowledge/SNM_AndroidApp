@@ -11,7 +11,6 @@ class SharkInit {
         const val SYNC_WITH_OTHERS_IN_SECONDS_KEY: String = "syncWithOthersInSeconds"
     }
     fun printMessage(context: Context) : String {
-        print("testtesttest")
         return sixDigitsToString(123456)
     }
 }

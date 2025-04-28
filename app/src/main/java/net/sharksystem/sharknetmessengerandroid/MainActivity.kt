@@ -50,7 +50,7 @@ fun ExampleText(ipAddress: String, test: String) {
         Text(
             text = ipAddress,
             fontSize = 20.sp,
-            modifier = Modifier.align(Alignment.Center)  // Positioniert den Text in der Mitte
+            modifier = Modifier.align(Alignment.Center)
         )
 
         Text(

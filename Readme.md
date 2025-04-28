@@ -1,4 +1,5 @@
 # SharkNetMessenger@Android
 ## Was
 
-## W
+## Was bisher geschah
+1. Shark Messenger Library als Jar exportiert und unter app/libs eingefügt
