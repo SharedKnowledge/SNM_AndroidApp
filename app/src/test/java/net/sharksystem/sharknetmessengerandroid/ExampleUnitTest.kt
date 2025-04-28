@@ -1,4 +1,4 @@
-package com.example.sharknetmessengerandroid
+package net.sharksystem.sharknetmessengerandroid
 
 import org.junit.Test
 

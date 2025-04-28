@@ -1,4 +1,4 @@
-package com.example.sharknetmessengerandroid.ui.theme
+package net.sharksystem.sharknetmessengerandroid.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
