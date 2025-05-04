@@ -5,18 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import net.sharksystem.sharknetmessengerandroid.helper.Networking
-import net.sharksystem.sharknetmessengerandroid.helper.SharkInit
+import net.sharksystem.sharknetmessengerandroid.helper.SHARK
+import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,10 +22,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             SharkNetMessengerAndroidTheme {
                 val ipAddress = Networking().getLocalIpAddress(this)  // Holt die IP-Adresse
-                val test = SharkInit().printMessage(this)
+                val test = "Test"//SHARK("Test").transformDigits(123456,this)
+
                 ExampleText(ipAddress,test)
             }
         }
+
     }
 }
 
