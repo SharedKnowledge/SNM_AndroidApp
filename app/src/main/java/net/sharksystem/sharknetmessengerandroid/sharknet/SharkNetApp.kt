@@ -3,11 +3,11 @@ package net.sharksystem.sharknetmessengerandroid.sharknet
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import net.sharksystem.SharkPeer
 import net.sharksystem.SharkPeerFS
 import net.sharksystem.asap.ASAP
 import net.sharksystem.asap.android.Util
-import androidx.core.content.edit
 
 
 /**
@@ -73,8 +73,11 @@ class SharkNetApp {
         // produce application side shark peer
         this.sharkPeer = SharkPeerFS(this.peerName, rootDir.absolutePath)
         ///////////////////////////// SETUP PKI /////////////////////////////
-        // create Android specific key store
-
+        // create Android specific key store @todo AndroidASAPKeyStore (like SharkNet2Android) net.sharksystem.sharknet.AndroidASAPKeyStore
+        // create PKI Component Factory and add as Component
+        // create Messenger Component Factory and add as Component
+        // initialize Peer
+        // start App
     }
     /**
      * Returns the internal [SharkPeer] instance.
