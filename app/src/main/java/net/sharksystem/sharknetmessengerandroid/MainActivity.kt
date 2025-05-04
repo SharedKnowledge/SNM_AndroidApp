@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import net.sharksystem.sharknetmessengerandroid.helper.Networking
-import net.sharksystem.sharknetmessengerandroid.helper.SHARK
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 class MainActivity : ComponentActivity() {
