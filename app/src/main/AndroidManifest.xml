@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="net.sharksystem.sharknetmessengerandroid.ui.InitActivity"
+            android:name="net.sharksystem.sharknetmessengerandroid.InitActivity"
             android:exported="true">
         </activity>
 

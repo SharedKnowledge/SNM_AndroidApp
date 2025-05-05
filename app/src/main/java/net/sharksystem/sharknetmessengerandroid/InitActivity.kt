@@ -1,11 +1,12 @@
-package net.sharksystem.sharknetmessengerandroid.ui
+package net.sharksystem.sharknetmessengerandroid
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import net.sharksystem.sharknetmessengerandroid.R
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 
 class InitActivity : ComponentActivity(){

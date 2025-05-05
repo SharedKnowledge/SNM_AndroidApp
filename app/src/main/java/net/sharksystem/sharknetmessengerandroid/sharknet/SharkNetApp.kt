@@ -73,10 +73,12 @@ class SharkNetApp {
         }
         // produce folder
         val rootDir = Util.getASAPRootDirectory(context, APP_FOLDER_NAME, this.peerName)
+        //@todo filetransfer connection to that
         // produce application side shark peer
         this.sharkPeer = SharkPeerFS(this.peerName, rootDir.absolutePath)
         ///////////////////////////// SETUP PKI /////////////////////////////
-        // create Android specific key store @todo AndroidASAPKeyStore (like SharkNet2Android) net.sharksystem.sharknet.AndroidASAPKeyStore
+        // create Android specific key store
+        // @todo AndroidASAPKeyStore (like SharkNet2Android) net.sharksystem.sharknet.AndroidASAPKeyStore
         // create PKI Component Factory and add as Component
 //        val pkiComponentFactory = SharkPKIComponentFactory()
 //        // register this component with shark peer
