@@ -7,9 +7,12 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import net.sharksystem.SharkPeer
 import net.sharksystem.SharkPeerFS
+import net.sharksystem.app.messenger.SharkNetMessengerComponent
+import net.sharksystem.app.messenger.SharkNetMessengerComponentFactory
 import net.sharksystem.asap.ASAP
 import net.sharksystem.asap.android.Util
 import net.sharksystem.asap.android.apps.ASAPAndroidPeer
+import net.sharksystem.pki.SharkPKIComponent
 
 
 /**
@@ -41,7 +44,9 @@ class SharkNetApp {
          * @param peerName The name of the peer (e.g., user ID or alias).
          */
         fun initialize(context: Context, peerName: String) {
-            singleton = SharkNetApp(context, peerName)
+            if (singleton == null) {
+                singleton = SharkNetApp(context, peerName)
+            }
         }
     }
     /**
@@ -50,7 +55,7 @@ class SharkNetApp {
      * @param context The Android context.
      * @param peerName The name of the peer.
      */
-    constructor(context: Context, peerName: String) {
+    private constructor(context: Context, peerName: String) {
         if (peerName == "") throw IllegalArgumentException("peerName must not be empty")
 
         val sharedPref: SharedPreferences = context.getSharedPreferences(
@@ -90,17 +95,17 @@ class SharkNetApp {
         // create Messenger Component Factory and add as Component
         // create messenger factory - needs a pki
         // get messenger factory with pki component as parameter.
-//        val messengerFactory =
-//            SharkNetMessengerComponentFactory(
-//                singleton!!.sharkPeer
-//                    .getComponent(SharkPKIComponent::class.java) as SharkPKIComponent?
-//            )
+        val messengerFactory =
+            SharkNetMessengerComponentFactory(
+                singleton!!.sharkPeer
+                    .getComponent(SharkPKIComponent::class.java) as SharkPKIComponent?
+            )
 //        // register this component with shark peer
 //        singleton!!.sharkPeer.addComponent(
 //            messengerFactory, SharkNetMessengerComponent::class.java
 //        )
         // initialize Peer
-//        // setup android (application side peer)
+        // setup android (application side peer)
 //        ASAPAndroidPeer.initializePeer(
 //            peerID,
 //            singleton!!.sharkPeer.formats,
@@ -113,7 +118,7 @@ class SharkNetApp {
 //        val applicationSideASAPPeer = ASAPAndroidPeer.startPeer(context)
 //        // remember
 //        singleton!!.setApplicationSideASAPAndroidPeer(applicationSideASAPPeer)
-        // start peer
+//        // start peer
 //        // use asap peer proxy for this app side shark peer
 //        singleton!!.sharkPeer.start(applicationSideASAPPeer)
     }

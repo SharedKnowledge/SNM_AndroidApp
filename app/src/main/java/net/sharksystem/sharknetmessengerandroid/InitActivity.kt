@@ -18,10 +18,9 @@ class InitActivity : ComponentActivity(){
         val button = findViewById<Button>(R.id.buttonSubmit)
 
         button.setOnClickListener {
-            sharkNetApp = SharkNetApp(this, peerName.text.toString())
-            SharkNetApp.Companion.initialize(this,peerName.text.toString())
-            val testString = SharkNetApp.Companion.singleton
-            Toast.makeText(this, "Dein Result: ${testString?.getPeer()?.sharkPeerName} ", Toast.LENGTH_SHORT).show()
+            SharkNetApp.initialize(this, peerName.text.toString())
+            val testString = SharkNetApp.Companion.singleton?.getPeer()?.sharkPeerName
+            Toast.makeText(this, "Dein Result: ${testString} ", Toast.LENGTH_SHORT).show()
         }
     }
 }
