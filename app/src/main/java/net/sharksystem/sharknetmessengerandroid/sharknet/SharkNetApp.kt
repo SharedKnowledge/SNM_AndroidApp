@@ -95,11 +95,11 @@ class SharkNetApp {
         // create Messenger Component Factory and add as Component
         // create messenger factory - needs a pki
         // get messenger factory with pki component as parameter.
-        val messengerFactory =
-            SharkNetMessengerComponentFactory(
-                singleton!!.sharkPeer
-                    .getComponent(SharkPKIComponent::class.java) as SharkPKIComponent?
-            )
+//        val messengerFactory =
+//            SharkNetMessengerComponentFactory(
+//                singleton!!.sharkPeer
+//                    .getComponent(SharkPKIComponent::class.java) as SharkPKIComponent?
+//            )
 //        // register this component with shark peer
 //        singleton!!.sharkPeer.addComponent(
 //            messengerFactory, SharkNetMessengerComponent::class.java
