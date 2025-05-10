@@ -1,18 +1,14 @@
 package net.sharksystem.sharknetmessengerandroid.sharknet
 
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import net.sharksystem.SharkPeer
 import net.sharksystem.SharkPeerFS
-import net.sharksystem.app.messenger.SharkNetMessengerComponent
-import net.sharksystem.app.messenger.SharkNetMessengerComponentFactory
 import net.sharksystem.asap.ASAP
 import net.sharksystem.asap.android.Util
 import net.sharksystem.asap.android.apps.ASAPAndroidPeer
-import net.sharksystem.pki.SharkPKIComponent
 
 
 /**
@@ -122,6 +118,7 @@ class SharkNetApp {
 //        // use asap peer proxy for this app side shark peer
 //        singleton!!.sharkPeer.start(applicationSideASAPPeer)
     }
+
     /**
      * Returns the internal [SharkPeer] instance.
      *
@@ -132,5 +129,26 @@ class SharkNetApp {
     }
     private fun setApplicationSideASAPAndroidPeer(asapAndroidPeer: ASAPAndroidPeer?) {
         this.asapAndroidPeer = asapAndroidPeer
+    }
+
+    /**////////////////////////////////////////////////////////////////////////////////////////// */
+    //                       application setting beside ASAP/Shark                                //
+    /**////////////////////////////////////////////////////////////////////////////////////////// */
+    val PREFERENCES_FILE: String = "SharkNet2Identity"
+    private val OWNER_NAME: String = "SharkNet2Identity_OwnerName"
+    private val OWNER_ID: String = "SharkNet2Identity_OwnerID"
+
+    val DEFAULT_OWNER_NAME: String = "SNUser"
+    private val DEFAULT_OWNER_ID: String = "Default_SN_USER_ID"
+
+    private var ownerName: CharSequence? = null
+    private val ownerID: CharSequence? = null
+
+    fun getOwnerID(): CharSequence? {
+        return this.ownerID
+    }
+
+    fun getOwnerName(): CharSequence? {
+        return this.ownerName
     }
 }
