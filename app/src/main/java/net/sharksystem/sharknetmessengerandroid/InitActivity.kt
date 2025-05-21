@@ -8,10 +8,13 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
+import net.sharksystem.pki.AndroidSharkPKIComponentImpl
+import net.sharksystem.pki.SharkPKIComponent
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.jvm.java
 
 class InitActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,18 +26,26 @@ class InitActivity : ComponentActivity(){
 
         button.setOnClickListener {
             SharkNetApp.initialize(this, peerName.text.toString())
-            val testString = SharkNetApp.Companion.singleton?.getPeer()?.sharkPeerName
+            val testPeerNameOutput = SharkNetApp.Companion.singleton?.getPeer()?.sharkPeerName
 
+            // PKI Component
+            val pkiComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java)
+            val pkiComponentImpl = pkiComponent as? AndroidSharkPKIComponentImpl
+
+            val personvalueNumber = pkiComponentImpl?.numberOfPersons
+            val certs = pkiComponentImpl?.certificates
+
+            // Messanger Component
             val messengerComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
             val messengerComponentImpl = messengerComponent as? SharkNetMessengerComponentImpl
+            // testMessage
             messengerComponentImpl?.sendSharkMessage(
                 "text/plain",
                 "Hallo ${SharkNetApp.Companion.singleton!!.getPeer().sharkPeerName}, deine Welt".toByteArray(),
                 "sn://universal",
                 true
             )
-            //var channeltest = messengerComponentImpl?.getChannel(0)?.messages?.getSharkMessage(0,true)?.content.toString()
-            //var channeltest = messengerComponentImpl?.getChannel(0)?.messages?.getSharkMessage(0,true)?.contentType
+
             var channelmnessagessize = messengerComponentImpl?.getChannel(0)?.messages?.size()
             var testMessage = messengerComponentImpl?.getChannel("sn://universal")?.messages?.getSharkMessage(0,false)
 
@@ -46,10 +57,21 @@ class InitActivity : ComponentActivity(){
             val instant = Instant.ofEpochMilli(testMessage!!.creationTime)
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
                 .withZone(ZoneId.systemDefault())
-
             val formattedTime = formatter.format(instant)
+            val instant_key_creation = Instant.ofEpochMilli(pkiComponentImpl!!.keysCreationTime)
+            val formatter_key_creation = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+                .withZone(ZoneId.systemDefault())
+            val formattedTime_key_creation = formatter.format(instant_key_creation)
 
-            var finalString = "Gesamtmessages: " + channelmnessagessize +
+
+
+
+            var finalString =
+                    "Allgemein" +
+                    "\nGesamtmessages: " + channelmnessagessize +
+                    "\nChannels: " + messengerComponentImpl?.channelUris +
+                    "\nASAP Storage: " + messengerComponentImpl?.asapStorage +
+                    "\n\nMessage" +
                     "\nAbsender: " + testMessage.sender.toString() +
                     "\nCreation Time: " + formattedTime +
                     "\nRecipients: " + testMessage.recipients +
@@ -58,9 +80,15 @@ class InitActivity : ComponentActivity(){
                     "\nVerified: " + testMessage.verified() +
                     "\nSigned: " + testMessage.signed() +
                     "\nEncrypted: " + testMessage.encrypted() +
-                    "\nCould be Decrypted: " + testMessage.couldBeDecrypted()
+                    "\nCould be Decrypted: " + testMessage.couldBeDecrypted() +
+                    "\n\nPKI" +
+                    "\nPerson Value: " + personvalueNumber +
+                    "\nCerts: " + certs +
+                    "\nKey Creation Time: " + formattedTime_key_creation +
+                    "\nPub Key Algorithm: " + pkiComponentImpl.publicKey.algorithm
             textview.text = finalString
-            Toast.makeText(this, "Test Run läuft durch", Toast.LENGTH_LONG).show()
+
+            Toast.makeText(this, "Test Run läuft durch: $testPeerNameOutput", Toast.LENGTH_LONG).show()
             //Toast.makeText(this, "Dein Result: ${testString} ${channeltest}", Toast.LENGTH_LONG).show()
         }
     }
