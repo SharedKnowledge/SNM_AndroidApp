@@ -28,16 +28,20 @@ class InitActivity : ComponentActivity(){
             SharkNetApp.initialize(this, peerName.text.toString())
             val testPeerNameOutput = SharkNetApp.Companion.singleton?.getPeer()?.sharkPeerName
 
-            // PKI Component
+            //////// PKI Component ////////
             val pkiComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java)
             val pkiComponentImpl = pkiComponent as? AndroidSharkPKIComponentImpl
 
             val personvalueNumber = pkiComponentImpl?.numberOfPersons
             val certs = pkiComponentImpl?.certificates
 
-            // Messanger Component
+            //////// Messanger Component ////////
             val messengerComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
             val messengerComponentImpl = messengerComponent as? SharkNetMessengerComponentImpl
+
+            // Message list
+            var channel_messages = messengerComponentImpl?.getChannel("sn://universal")?.messages
+
             // testMessage
             messengerComponentImpl?.sendSharkMessage(
                 "text/plain",
@@ -46,8 +50,8 @@ class InitActivity : ComponentActivity(){
                 true
             )
 
-            var channelmnessagessize = messengerComponentImpl?.getChannel(0)?.messages?.size()
-            var testMessage = messengerComponentImpl?.getChannel("sn://universal")?.messages?.getSharkMessage(0,false)
+            var channelmnessagessize = channel_messages?.size()
+            var testMessage = channel_messages?.getSharkMessage(0,false) // latest first
 
             // convert message content
             val byteArray: ByteArray = testMessage?.content ?: ByteArray(0)
@@ -62,9 +66,6 @@ class InitActivity : ComponentActivity(){
             val formatter_key_creation = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
                 .withZone(ZoneId.systemDefault())
             val formattedTime_key_creation = formatter.format(instant_key_creation)
-
-
-
 
             var finalString =
                     "Allgemein" +
