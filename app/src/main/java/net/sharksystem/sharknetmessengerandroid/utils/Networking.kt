@@ -1,4 +1,4 @@
-package net.sharksystem.sharknetmessengerandroid.helper
+package net.sharksystem.sharknetmessengerandroid.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
