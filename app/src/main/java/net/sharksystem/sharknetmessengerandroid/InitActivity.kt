@@ -22,7 +22,6 @@ class InitActivity : ComponentActivity(){
         setContentView(R.layout.init_peer) // load xml
         val peerName = findViewById<EditText>(R.id.PeerNameInput) // assign
         val button = findViewById<Button>(R.id.buttonSubmit)
-        val textview = findViewById<TextView>(R.id.textView3)
 
         button.setOnClickListener {
             SharkNetApp.initialize(this, peerName.text.toString())
@@ -87,7 +86,8 @@ class InitActivity : ComponentActivity(){
                     "\nCerts: " + certs +
                     "\nKey Creation Time: " + formattedTime_key_creation +
                     "\nPub Key Algorithm: " + pkiComponentImpl.publicKey.algorithm
-            textview.text = finalString
+            val textView = findViewById<TextView>(R.id.textView3)
+            textView.text = finalString
 
             Toast.makeText(this, "Test Run läuft durch: $testPeerNameOutput", Toast.LENGTH_LONG).show()
             //Toast.makeText(this, "Dein Result: ${testString} ${channeltest}", Toast.LENGTH_LONG).show()
