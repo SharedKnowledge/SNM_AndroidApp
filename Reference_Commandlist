@@ -1,0 +1,111 @@
+# TCP
+- - - 
+- **`openTCP`**
+	Open new port for establishing TCP connections with.
+- **`connectTCP`**
+	Connect to a host on given port number.
+- **`closeTCP`**
+	Closes a specified open port - except no more new connections to be established.
+- **`showOpenTCPPorts`**
+	print open TCP ports
+
+# Persons
+- - - 
+- **rnPerson**
+	change person's name.
+- **setSF**
+	Sets the signing failure rate for a specific peer.
+- **lsPersons**
+	List known persons.
+
+# Basics
+- - -
+- **`destroyPeer`**
+	BE CAREFUL. ALL PEER DATA WILL BE DELETED. Application stops.
+`exit`
+	Terminates the messenger.
+`status`
+	Show app setting - #todo: should be changeable.
+
+# External
+- - - 
+**`decryptFile`**
+	decrypt an extern file decrypted for this peer.
+**`encryptFile`**
+	encrypt an extern file for a specific peer.
+
+# Messenger
+- - - 
+mkChannel
+	Creates a new channel by uri.
+rmChannel
+	Removes a channel by index (not supported in version 1. not implemented yet.
+sendMessage
+	send SNMessage \[content, contentType (sn/characters), sign (true), receiverName (ANY_SHARKNET_PEER), , encrypt (false), channel index (1)]
+lsChannel
+	List existing channels.
+lsMessages
+	List messages in channel (index default: universal channel.
+
+# Hub Management
+- - - 
+lsHubs
+	list all hubs running locally
+startHub
+	t (6907), createNewConnection (true), maxIdleInSeconds (60)
+stopHub
+	Open new port for establishing TCP connections with.
+
+# Testing
+- - - 
+wait
+	waits a millisecond
+echo
+	echo command
+saveLog
+	Saves the current log to a file.
+markstep
+	echo command
+clearLog
+	Clear the log.
+showLog
+	Prints a log message with all executed commands in the right order.
+
+# Hub Access
+---------
+lsHubDescr
+	List known hub information.
+addHubDescr
+	Define a new asap hub by its hostname, port and if it supports multichannel.
+connectHubFromList
+	Connect to a hub.
+rmHubDescr
+	Remove hub description from list.
+connectHub
+	connects to a hub: hostname (localhost), port (6907), createNewConnection (yes)
+disconnectHub
+	disconnects from a running hub
+lsConnectedHubs
+	list connected hubs.
+
+# Encounter
+---------
+**`lsEncounter`**
+	print open encounter
+
+# PKI
+---------
+**`lsCredentials`**
+	show pending (not yet refused or accepted) credentials
+`certBySubject`
+	show all certificates issued for a specific peer (the subject).
+**`certByIssuer`**
+	show all certificates issued by a specific peer.
+**`refuseCredential`**
+	refuse pending credential message
+`sendCredential`
+	Send a credential message to a specific peer to ask for a certificate.
+`lsCerts`
+	list all certificates
+**`acceptCredential`**
+	accept pending credential message
