@@ -1,4 +1,6 @@
 // In OnboardingActivity.kt
+package net.sharksystem.sharknetmessengerandroid
+
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -22,6 +24,7 @@ import androidx.core.view.setPadding
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 import androidx.core.content.edit
 import net.sharksystem.sharknetmessengerandroid.MainActivity
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 
 class OnboardingActivity : AppCompatActivity() {
 
@@ -30,6 +33,7 @@ class OnboardingActivity : AppCompatActivity() {
 
         setContent {
             SharkNetMessengerAndroidTheme() {}
+            OnboardingScreenComposable()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
@@ -76,6 +80,8 @@ class OnboardingActivity : AppCompatActivity() {
                     Toast.makeText(context, "Please enter a username", Toast.LENGTH_SHORT).show()
                 } else {
                     saveUsername(finalUsername)
+                    SharkNetApp.initialize(context,finalUsername)
+                    Toast.makeText(context,"Peer with name ${finalUsername} was created", Toast.LENGTH_SHORT).show()
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
                     (context as? Activity)?.finish()
