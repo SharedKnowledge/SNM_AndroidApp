@@ -16,6 +16,7 @@
 
 package net.sharksystem.sharknetmessengerandroid
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -54,12 +55,6 @@ import net.sharksystem.sharknetmessengerandroid.utils.Networking
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 import kotlin.getValue
 
-/*
-    AppCompatActivity extends FragmentActivity which extends ComponentActivity.
-    ComponentActivity has all you need for a Compose-only app.
-    If you need AppCompat APIs, an AndroidView which works with AppCompat or MaterialComponents theme, or you need Fragments then use AppCompatActivity.
-    https://stackoverflow.com/questions/67891362/componentactivity-vs-appcompatactivity-in-android-jetpack-compose
- */
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
 
@@ -68,6 +63,17 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets -> insets }
+
+        // Example: Check SharedPreferences
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val isUsernameSet = prefs.getBoolean("peer_name_set", false)
+
+        if (!isUsernameSet) {
+            val intent = Intent(this, OnboardingActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
 
         setContentView(
             ComposeView(this).apply {
