@@ -68,8 +68,8 @@ import androidx.compose.ui.unit.dp
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.components.AnimatingFabContent
 import net.sharksystem.sharknetmessengerandroid.ui.components.baselineHeight
-import net.sharksystem.sharknetmessengerandroid.ui.data.colleagueProfile
-import net.sharksystem.sharknetmessengerandroid.ui.data.meProfile
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkColleagueProfile
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkMeProfile
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -278,7 +278,7 @@ fun ProfileFab(
 @Composable
 fun ConvPreviewLandscapeMeDefault() {
     SharkNetMessengerAndroidTheme {
-        ProfileScreen(meProfile)
+        ProfileScreen(sharkMeProfile)
     }
 }
 
@@ -286,7 +286,7 @@ fun ConvPreviewLandscapeMeDefault() {
 @Composable
 fun ConvPreviewPortraitMeDefault() {
     SharkNetMessengerAndroidTheme {
-        ProfileScreen(meProfile)
+        ProfileScreen(sharkMeProfile)
     }
 }
 
@@ -294,7 +294,7 @@ fun ConvPreviewPortraitMeDefault() {
 @Composable
 fun ConvPreviewPortraitOtherDefault() {
     SharkNetMessengerAndroidTheme {
-        ProfileScreen(colleagueProfile)
+        ProfileScreen(sharkColleagueProfile)
     }
 }
 

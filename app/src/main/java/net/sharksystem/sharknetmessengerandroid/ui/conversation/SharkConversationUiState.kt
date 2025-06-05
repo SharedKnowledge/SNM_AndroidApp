@@ -21,7 +21,7 @@ import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
-import net.sharksystem.sharknetmessengerandroid.ui.data.SharkData
+import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
 
 class SharkConversationUiState(
     val channelUri: String,
@@ -40,7 +40,7 @@ class SharkConversationUiState(
             this.channelUri,
             true
         )
-        val newMessages: List<SharkNetMessage> = SharkData.reloadMessages(channelUri)
+        val newMessages: List<SharkNetMessage> = SharkDataHelper.reloadMessages(channelUri)
         _messages.addAll(newMessages)
     }
 }

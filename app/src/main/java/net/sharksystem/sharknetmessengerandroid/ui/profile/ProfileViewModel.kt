@@ -21,8 +21,8 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import net.sharksystem.sharknetmessengerandroid.ui.data.colleagueProfile
-import net.sharksystem.sharknetmessengerandroid.ui.data.meProfile
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkColleagueProfile
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkMeProfile
 
 class ProfileViewModel : ViewModel() {
 
@@ -30,13 +30,13 @@ class ProfileViewModel : ViewModel() {
 
     fun setUserId(newUserId: String?) {
         if (newUserId != userId) {
-            userId = newUserId ?: meProfile.userId
+            userId = newUserId ?: sharkMeProfile.userId
         }
         // Workaround for simplicity
-        _userData.value = if (userId == meProfile.userId || userId == meProfile.displayName) {
-            meProfile
+        _userData.value = if (userId == sharkMeProfile.userId || userId == sharkMeProfile.displayName) {
+            sharkMeProfile
         } else {
-            colleagueProfile
+            sharkColleagueProfile
         }
     }
 
@@ -56,5 +56,5 @@ data class ProfileScreenState(
     val timeZone: String?, // Null if me
     val commonChannels: String? // Null if me
 ) {
-    fun isMe() = userId == meProfile.userId
+    fun isMe() = userId == sharkMeProfile.userId
 }

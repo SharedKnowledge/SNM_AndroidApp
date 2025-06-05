@@ -30,6 +30,7 @@ import androidx.navigation.findNavController
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.MainViewModel
 import net.sharksystem.sharknetmessengerandroid.ui.data.exampleUiState
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 class ConversationFragment : Fragment() {
@@ -45,6 +46,7 @@ class ConversationFragment : Fragment() {
 
         setContent {
             SharkNetMessengerAndroidTheme {
+                //SharkConversationContent(
                 ConversationContent(
                     uiState = exampleUiState,
                     navigateToProfile = { user ->
