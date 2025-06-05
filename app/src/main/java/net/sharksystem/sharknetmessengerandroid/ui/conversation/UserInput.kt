@@ -59,11 +59,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AlternateEmail
-import androidx.compose.material.icons.outlined.Duo
-import androidx.compose.material.icons.outlined.InsertPhoto
-import androidx.compose.material.icons.outlined.Mood
-import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -110,19 +110,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.R
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.delay
 
 enum class InputSelector {
     NONE,
-    MAP,
     DM,
     EMOJI,
     PHONE,
-    PICTURE
+    FILE,
+    ENCRYPTED,
+    SIGNED,
 }
 
 enum class EmojiStickerSelector {
@@ -133,7 +135,6 @@ enum class EmojiStickerSelector {
 @Preview
 @Composable
 fun UserInputPreview() {
-    UserInput(onMessageSent = {})
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -145,6 +146,8 @@ fun UserInput(
 ) {
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
     val dismissKeyboard = { currentInputSelector = InputSelector.NONE }
+    var encrypted by rememberSaveable { mutableStateOf(false) }
+    var encryptionPeer by rememberSaveable { mutableStateOf<String?>(null) }
 
     // Intercept back navigation if there's a InputSelector visible
     if (currentInputSelector != InputSelector.NONE) {
@@ -183,7 +186,13 @@ fun UserInput(
                 focusState = textFieldFocusState
             )
             UserInputSelector(
-                onSelectorChange = { currentInputSelector = it },
+                onSelectorChange = { selector ->
+                    if (selector == InputSelector.ENCRYPTED) {
+                        encrypted = !encrypted
+                    } else {
+                        currentInputSelector = selector
+                    }
+                },
                 sendMessageEnabled = textState.text.isNotBlank(),
                 onMessageSent = {
                     onMessageSent(textState.text)
@@ -193,7 +202,8 @@ fun UserInput(
                     resetScroll()
                     dismissKeyboard()
                 },
-                currentInputSelector = currentInputSelector
+                currentInputSelector = currentInputSelector,
+                encrypted = encrypted
             )
             SelectorExpanded(
                 onCloseRequested = dismissKeyboard,
@@ -239,9 +249,10 @@ private fun SelectorExpanded(
         when (currentSelector) {
             InputSelector.EMOJI -> EmojiSelector(onTextAdded, focusRequester)
             InputSelector.DM -> NotAvailablePopup(onCloseRequested)
-            InputSelector.PICTURE -> FunctionalityNotAvailablePanel()
-            InputSelector.MAP -> FunctionalityNotAvailablePanel()
+            InputSelector.FILE -> FunctionalityNotAvailablePanel()
+            // InputSelector.MAP -> FunctionalityNotAvailablePanel()
             InputSelector.PHONE -> FunctionalityNotAvailablePanel()
+            InputSelector.ENCRYPTED -> {}
             else -> {
                 throw NotImplementedError()
             }
@@ -283,6 +294,7 @@ private fun UserInputSelector(
     sendMessageEnabled: Boolean,
     onMessageSent: () -> Unit,
     currentInputSelector: InputSelector,
+    encrypted: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -294,34 +306,43 @@ private fun UserInputSelector(
     ) {
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.EMOJI) },
-            icon = Icons.Outlined.Mood,
+            icon = Icons.Outlined.Face,
             selected = currentInputSelector == InputSelector.EMOJI,
             description = stringResource(id = R.string.emoji_selector_bt_desc)
         )
         InputSelectorButton(
+            // on click set channel to existing private channel or create one.
             onClick = { onSelectorChange(InputSelector.DM) },
-            icon = Icons.Outlined.AlternateEmail,
+            icon = Icons.Outlined.Email,
             selected = currentInputSelector == InputSelector.DM,
             description = stringResource(id = R.string.dm_desc)
         )
         InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.PICTURE) },
-            icon = Icons.Outlined.InsertPhoto,
-            selected = currentInputSelector == InputSelector.PICTURE,
+            onClick = { onSelectorChange(InputSelector.FILE) },
+            // warum gibts kein paperclip icon??
+            icon = Icons.Outlined.Search,
+            selected = currentInputSelector == InputSelector.FILE,
             description = stringResource(id = R.string.attach_photo_desc)
         )
         InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.MAP) },
-            icon = Icons.Outlined.Place,
-            selected = currentInputSelector == InputSelector.MAP,
-            description = stringResource(id = R.string.map_selector_desc)
+            onClick = { onSelectorChange(InputSelector.ENCRYPTED) },
+            icon = if (encrypted) Icons.Filled.Lock else Icons.Outlined.Lock, // use filled icon if encrypted == true
+            selected = encrypted,
+            description = "Toggle Encryption",
         )
-        InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.PHONE) },
-            icon = Icons.Outlined.Duo,
-            selected = currentInputSelector == InputSelector.PHONE,
-            description = stringResource(id = R.string.videochat_desc)
-        )
+
+//        InputSelectorButton(
+//            onClick = { onSelectorChange(InputSelector.MAP) },
+//            icon = Icons.Outlined.Place,
+//            selected = currentInputSelector == InputSelector.MAP,
+//            description = stringResource(id = R.string.map_selector_desc)
+//        )
+//        InputSelectorButton(
+//            onClick = { onSelectorChange(InputSelector.PHONE) },
+//            icon = Icons.Outlined.Duo,
+//            selected = currentInputSelector == InputSelector.PHONE,
+//            description = stringResource(id = R.string.videochat_desc)
+//        )
 
         val border = if (!sendMessageEnabled) {
             BorderStroke(
@@ -354,6 +375,29 @@ private fun UserInputSelector(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
+    }
+}
+
+//Encrypt for peer, if left empty, encrypt for all peers
+@Composable
+private fun EncryptForPeer(
+    onPeerSelected: (String?) -> Unit,
+    onCloseRequested: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(320.dp)
+    ) {
+        Text(
+            text = "Encrypt for Peer: ",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+        //todo:
+        //Person to encrypt for
+        // there is a class called PersonStoreImplAndCertsWrapper that can be used to get the list of persons
     }
 }
 
@@ -651,6 +695,56 @@ fun ExtendedSelectorInnerButton(
         )
     }
 }
+
+@Composable
+fun ConversationScreen(
+    messengerComponent : SharkNetMessengerComponentImpl,
+    contentType: String,
+    uri: CharSequence,
+    encrypted: Boolean = false,
+    signed: Boolean = true,
+    recipientSet: MutableSet<CharSequence>? = null,
+    recipient: CharSequence? = null
+) {
+    UserInput(
+        onMessageSent = { messageText ->
+            when {
+                !recipientSet.isNullOrEmpty() -> {
+                    messengerComponent.sendSharkMessage(
+                        "sn/$contentType",
+                        messageText.toByteArray(),
+                        "sn://$uri",
+                        recipientSet,
+                        signed,
+                        encrypted,
+                    )
+                }
+
+                recipient != null -> {
+                    messengerComponent.sendSharkMessage(
+                        "sn/$contentType",
+                        messageText.toByteArray(),
+                        "sn://$uri",
+                        recipient,
+                        signed,
+                        encrypted
+                    )
+                }
+
+                else -> {
+                    messengerComponent.sendSharkMessage(
+                        "sn/$contentType",
+                        messageText.toByteArray(),
+                        "sn://$uri",
+                        signed
+                    )
+                }
+            }
+        }
+    )
+}
+
+//todo: add the send file functionality on button click.
 
 @Composable
 fun EmojiTable(
