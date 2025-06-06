@@ -289,7 +289,7 @@ fun SNMessages(
 
         val authorMe = stringResource(id = R.string.author_me)
         LazyColumn(
-            reverseLayout = true,
+            //reverseLayout = true,
             state = scrollState,
             modifier = Modifier
                 .testTag(SNConversationTestTag)
@@ -372,6 +372,7 @@ fun SNMessage(
             // Avatar
             Image(
                 painter = painterResource(id = R.drawable.placeholder_avatar),
+                //@todo try from shark data
                 contentDescription = null,
                 modifier = Modifier
                     .size(42.dp)

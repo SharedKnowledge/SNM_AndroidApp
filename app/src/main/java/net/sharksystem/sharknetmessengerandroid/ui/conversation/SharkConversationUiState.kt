@@ -17,6 +17,7 @@
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import androidx.compose.runtime.toMutableStateList
+import kotlinx.coroutines.awaitAll
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
@@ -40,7 +41,10 @@ class SharkConversationUiState(
             this.channelUri,
             true
         )
+        Thread.sleep(1000) //@todo transform instead of sleep to a wait for messages to be updated
         val newMessages: List<SharkNetMessage> = SharkDataHelper.reloadMessages(channelUri)
+        _messages.clear()
         _messages.addAll(newMessages)
+        //_messages.addAll(newMessages)
     }
 }

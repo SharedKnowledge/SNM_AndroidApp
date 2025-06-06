@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import net.sharksystem.sharknetmessengerandroid.databinding.ContentMainBinding
 import kotlinx.coroutines.launch
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import net.sharksystem.sharknetmessengerandroid.ui.MainViewModel
 import net.sharksystem.sharknetmessengerandroid.ui.components.Drawer
 import net.sharksystem.sharknetmessengerandroid.utils.Networking
@@ -66,14 +67,22 @@ class MainActivity : AppCompatActivity() {
 
         // Example: Check SharedPreferences
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val isUsernameSet = prefs.getBoolean("peer_name_set", false)
+        //val isUsernameSet = prefs.getBoolean("peer_name_set", false)
 
+        if(!SharkNetApp.load(this)) {
+            val intent = Intent(this, OnboardingActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+        /* //@todo deprecate isUsernameSet
         if (!isUsernameSet) {
             val intent = Intent(this, OnboardingActivity::class.java)
             startActivity(intent)
             finish()
             return
         }
+        */
 
         setContentView(
             ComposeView(this).apply {

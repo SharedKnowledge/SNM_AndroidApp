@@ -46,9 +46,9 @@ class ConversationFragment : Fragment() {
 
         setContent {
             SharkNetMessengerAndroidTheme {
-                //SharkConversationContent(
-                ConversationContent(
-                    uiState = exampleUiState,
+                SharkConversationContent(
+                //ConversationContent(
+                    uiState = sharkExampleUiState,
                     navigateToProfile = { user ->
                         // Click callback
                         val bundle = bundleOf("userId" to user)

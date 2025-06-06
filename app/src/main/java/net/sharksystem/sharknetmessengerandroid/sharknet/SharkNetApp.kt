@@ -20,6 +20,7 @@ import net.sharksystem.pki.AndroidSharkPKIComponentFactory
 import net.sharksystem.pki.AndroidSharkPKIComponentImpl
 import net.sharksystem.pki.SharkPKIComponent
 import net.sharksystem.pki.SharkPKIComponentFactory
+import kotlin.math.sin
 
 
 /**
@@ -51,8 +52,33 @@ class SharkNetApp {
          * @param peerName The name of the peer (e.g., user ID or alias).
          */
         fun initialize(context: Context, peerName: String) {
-            if (singleton == null) {
-                singleton = SharkNetApp(context, peerName)
+            if (peerName == "") throw IllegalArgumentException("peerName must not be empty")
+
+            val sharedPref: SharedPreferences = context.getSharedPreferences(
+                PREFERENCES_FILE, Context.MODE_PRIVATE
+            )
+            val existingPeerName = sharedPref.getString(PF_PEER_NAME, null)
+            val existingPeerID = sharedPref.getString(PF_PEER_ID, null)
+
+            if (existingPeerName != null && existingPeerID != null) {
+                singleton = SharkNetApp(context, existingPeerName)
+            } else {
+                singleton = SharkNetApp(context,peerName)
+            }
+        }
+
+        fun load(context: Context) : Boolean{
+            val sharedPref: SharedPreferences = context.getSharedPreferences(
+                PREFERENCES_FILE, Context.MODE_PRIVATE
+            )
+            val existingPeerName = sharedPref.getString(PF_PEER_NAME, null)
+            val existingPeerID = sharedPref.getString(PF_PEER_ID, null)
+
+            if (existingPeerName != null && existingPeerID != null) {
+                singleton = SharkNetApp(context, existingPeerName)
+                return true
+            } else {
+                return false
             }
         }
     }
@@ -63,8 +89,6 @@ class SharkNetApp {
      * @param peerName The name of the peer.
      */
     private constructor(context: Context, peerName: String) {
-        if (peerName == "") throw IllegalArgumentException("peerName must not be empty")
-
         val sharedPref: SharedPreferences = context.getSharedPreferences(
             PREFERENCES_FILE, Context.MODE_PRIVATE
         )
