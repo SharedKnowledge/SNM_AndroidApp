@@ -18,15 +18,9 @@ package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -36,14 +30,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -52,7 +43,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -62,8 +52,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.twotone.Approval
+import androidx.compose.material.icons.twotone.VerifiedUser
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -76,7 +68,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,18 +76,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -110,12 +97,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.R
-import kotlin.math.absoluteValue
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 enum class InputSelector {
     NONE,
@@ -147,6 +130,7 @@ fun UserInput(
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
     val dismissKeyboard = { currentInputSelector = InputSelector.NONE }
     var encrypted by rememberSaveable { mutableStateOf(false) }
+    var signed by rememberSaveable { mutableStateOf(true) }
     var encryptionPeer by rememberSaveable { mutableStateOf<String?>(null) }
 
     // Intercept back navigation if there's a InputSelector visible
@@ -189,6 +173,8 @@ fun UserInput(
                 onSelectorChange = { selector ->
                     if (selector == InputSelector.ENCRYPTED) {
                         encrypted = !encrypted
+                    } else if (selector == InputSelector.SIGNED) {
+                        signed = !signed
                     } else {
                         currentInputSelector = selector
                     }
@@ -237,7 +223,7 @@ private fun SelectorExpanded(
     if (currentSelector == InputSelector.NONE) return
 
     // Request focus to force the TextField to lose it
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     // If the selector is shown, always request focus to trigger a TextField.onFocusChange.
     SideEffect {
         if (currentSelector == InputSelector.EMOJI) {
@@ -290,12 +276,13 @@ fun FunctionalityNotAvailablePanel() {
 
 @Composable
 private fun UserInputSelector(
+    modifier: Modifier = Modifier,
     onSelectorChange: (InputSelector) -> Unit,
     sendMessageEnabled: Boolean,
     onMessageSent: () -> Unit,
     currentInputSelector: InputSelector,
     encrypted: Boolean = false,
-    modifier: Modifier = Modifier
+    signed: Boolean = true,
 ) {
     Row(
         modifier = modifier
@@ -326,9 +313,15 @@ private fun UserInputSelector(
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.ENCRYPTED) },
-            icon = if (encrypted) Icons.Filled.Lock else Icons.Outlined.Lock, // use filled icon if encrypted == true
+            icon = if (encrypted) Icons.Filled.Lock else Icons.Outlined.LockOpen, // use filled icon if encrypted == true
             selected = encrypted,
             description = "Toggle Encryption",
+        )
+        InputSelectorButton(
+            onClick = { onSelectorChange(InputSelector.SIGNED) },
+            icon = if (signed) Icons.TwoTone.VerifiedUser else Icons.TwoTone.Approval,
+            selected = signed,
+            description = "Toggle Signature",
         )
 
 //        InputSelectorButton(
@@ -458,59 +451,7 @@ private fun UserInputText(
     focusState: Boolean
 ) {
     val swipeOffset = remember { mutableStateOf(0f) }
-    var isRecordingMessage by remember { mutableStateOf(false) }
     val a11ylabel = stringResource(id = R.string.textfield_desc)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-        AnimatedContent(
-            targetState = isRecordingMessage,
-            label = "text-field",
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        ) { recording ->
-            Box(Modifier.fillMaxSize()) {
-                if (recording) {
-                    RecordingIndicator { swipeOffset.value }
-                } else {
-                    UserInputTextField(
-                        textFieldValue,
-                        onTextChanged,
-                        onTextFieldFocused,
-                        keyboardType,
-                        focusState,
-                        onMessageSent,
-                        Modifier.fillMaxWidth().semantics {
-                            contentDescription = a11ylabel
-                            keyboardShownProperty = keyboardShown
-                        }
-                    )
-                }
-            }
-        }
-        RecordButton(
-            recording = isRecordingMessage,
-            swipeOffset = { swipeOffset.value },
-            onSwipeOffsetChange = { offset -> swipeOffset.value = offset },
-            onStartRecording = {
-                val consumed = !isRecordingMessage
-                isRecordingMessage = true
-                consumed
-            },
-            onFinishRecording = {
-                // handle end of recording
-                isRecordingMessage = false
-            },
-            onCancelRecording = {
-                isRecordingMessage = false
-            },
-            modifier = Modifier.fillMaxHeight()
-        )
-    }
 }
 
 @Composable
@@ -558,70 +499,6 @@ private fun BoxScope.UserInputTextField(
             text = stringResource(R.string.textfield_hint),
             style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor)
         )
-    }
-}
-
-@Composable
-private fun RecordingIndicator(swipeOffset: () -> Float) {
-    var duration by remember { mutableStateOf(Duration.ZERO) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-            duration += 1.seconds
-        }
-    }
-    Row(
-        Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-
-        val animatedPulse = infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 0.2f,
-            animationSpec = infiniteRepeatable(
-                tween(2000),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "pulse",
-        )
-        Box(
-            Modifier
-                .size(56.dp)
-                .padding(24.dp)
-                .graphicsLayer {
-                    scaleX = animatedPulse.value; scaleY = animatedPulse.value
-                }
-                .clip(CircleShape)
-                .background(Color.Red)
-        )
-        Text(
-            duration.toComponents { minutes, seconds, _ ->
-                val min = minutes.toString().padStart(2, '0')
-                val sec = seconds.toString().padStart(2, '0')
-                "$min:$sec"
-            },
-            Modifier.alignByBaseline()
-        )
-        Box(
-            Modifier
-                .fillMaxSize()
-                .alignByBaseline()
-                .clipToBounds()
-        ) {
-            val swipeThreshold = with(LocalDensity.current) { 200.dp.toPx() }
-            Text(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .graphicsLayer {
-                        translationX = swipeOffset() / 2
-                        alpha = 1 - (swipeOffset().absoluteValue / swipeThreshold)
-                    },
-                textAlign = TextAlign.Center,
-                text = stringResource(R.string.swipe_to_cancel_recording),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
     }
 }
 
