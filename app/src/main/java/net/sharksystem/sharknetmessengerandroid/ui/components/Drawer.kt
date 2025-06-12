@@ -60,6 +60,7 @@ import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.data.colleagueProfile
 import net.sharksystem.sharknetmessengerandroid.ui.data.meProfile
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
+//copy profile to shark
 
 @Composable
 fun DrawerContent(
