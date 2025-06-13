@@ -48,7 +48,7 @@ class SharkDataHelper {
         fun formatTime(timeInMillis: Long): String {
             val dateTime = transformToTime(timeInMillis)
 
-            val formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            val formatted = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
             return formatted
         }
         fun getDate(timeinMillis: Long): LocalDate {

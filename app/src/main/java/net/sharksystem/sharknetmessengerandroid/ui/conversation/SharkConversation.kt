@@ -18,8 +18,6 @@
 
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
-//import net.sharksystem.ui.components.AppBar
-//import net.sharksystem.ui.theme.SharkNetMessengerAndroidTheme
 import FunctionalityNotAvailablePopup
 import android.content.ClipDescription
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -99,6 +97,7 @@ import net.sharksystem.sharknetmessengerandroid.ui.components.AppBar
 import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
 import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
+import java.time.format.DateTimeFormatter
 
 /**
  * Entry point for a conversation screen.
@@ -314,18 +313,11 @@ fun SNMessages(
                 val prevAuthor = messages.getOrNull(index - 1)?.sender
                 val nextAuthor = messages.getOrNull(index + 1)?.sender
                 val content = messages[index]
-                val isFirstMessageByAuthor = prevAuthor != content.sender
-                val isLastMessageByAuthor = nextAuthor != content.sender
 
-                // Hardcode day dividers for simplicity
-                if (index == messages.size - 1) {
-                    item {
-                        SNDayHeader("20 Aug")
-                    }
-                } else if (index == 2) {
-                    item {
-                        SNDayHeader("Today")
-                    }
+                var formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+                val currentMsgDate = SharkDataHelper.getDate(messages[index].creationTime).format(formatter)
+                val prevMsgDate = messages.getOrNull(index + 1)?.let {
+                    SharkDataHelper.getDate(it.creationTime).format(formatter)
                 }
 
                 item {
@@ -333,9 +325,13 @@ fun SNMessages(
                         onAuthorClick = { name -> navigateToProfile(name) },
                         msg = content,
                         isUserMe = content.sender == authorMe,
-                        isFirstMessageByAuthor = isFirstMessageByAuthor,
-                        isLastMessageByAuthor = isLastMessageByAuthor
                     )
+                }
+
+                if (currentMsgDate != prevMsgDate) {
+                    item {
+                        SNDayHeader(currentMsgDate)
+                    }
                 }
             }
         }
@@ -372,8 +368,6 @@ fun SNMessage(
     onAuthorClick: (String) -> Unit,
     msg: SharkNetMessage,
     isUserMe: Boolean,
-    isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean
 ) {
     val borderColor = if (isUserMe) {
         MaterialTheme.colorScheme.primary
@@ -381,9 +375,8 @@ fun SNMessage(
         MaterialTheme.colorScheme.tertiary
     }
 
-    val spaceBetweenAuthors = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
+    val spaceBetweenAuthors = Modifier.padding(top = 8.dp)
     Row(modifier = spaceBetweenAuthors) {
-        if (isLastMessageByAuthor) {
             // Avatar
             Image(
                 painter = painterResource(id = R.drawable.placeholder_avatar),
@@ -393,15 +386,9 @@ fun SNMessage(
                     .size(42.dp)
                     .clip(CircleShape)
             )
-        } else {
-            // Space under avatar
-            Spacer(modifier = Modifier.width(74.dp))
-        }
         SNAuthorAndTextMessage(
             msg = msg,
             isUserMe = isUserMe,
-            isFirstMessageByAuthor = isFirstMessageByAuthor,
-            isLastMessageByAuthor = isLastMessageByAuthor,
             authorClicked = onAuthorClick,
             modifier = Modifier
                 .padding(end = 16.dp)
@@ -414,23 +401,13 @@ fun SNMessage(
 fun SNAuthorAndTextMessage(
     msg: SharkNetMessage,
     isUserMe: Boolean,
-    isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean,
     authorClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        if (isLastMessageByAuthor) {
-            SNAuthorNameTimestamp(msg)
-        }
+        SNAuthorNameTimestamp(msg)
         SNChatItemBubble(msg, isUserMe, authorClicked = authorClicked)
-        if (isFirstMessageByAuthor) {
-            // Last bubble before next author
-            Spacer(modifier = Modifier.height(8.dp))
-        } else {
-            // Between bubbles
-            Spacer(modifier = Modifier.height(4.dp))
-        }
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 
