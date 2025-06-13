@@ -19,6 +19,7 @@ package net.sharksystem.sharknetmessengerandroid.ui.data
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.conversation.SharkConversationUiState
 import net.sharksystem.sharknetmessengerandroid.ui.profile.ProfileScreenState
+
 /*
 val sharkInitialMessages = listOf(
     Message(

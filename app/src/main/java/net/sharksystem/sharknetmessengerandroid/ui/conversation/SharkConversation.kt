@@ -18,6 +18,8 @@
 
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
+//import net.sharksystem.ui.components.AppBar
+//import net.sharksystem.ui.theme.SharkNetMessengerAndroidTheme
 import FunctionalityNotAvailablePopup
 import android.content.ClipDescription
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -51,8 +53,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -81,7 +83,6 @@ import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
@@ -91,13 +92,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import net.sharksystem.sharknetmessengerandroid.R
-//import net.sharksystem.ui.components.AppBar
-//import net.sharksystem.ui.theme.SharkNetMessengerAndroidTheme
 import kotlinx.coroutines.launch
 import net.sharksystem.app.messenger.SharkNetMessage
+import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.components.AppBar
-import net.sharksystem.sharknetmessengerandroid.ui.components.SharkIcon
+import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
 import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
@@ -133,6 +132,10 @@ fun SharkConversationContent(
         mutableStateOf(Color.Transparent)
     }
 
+    var encrypted by remember { mutableStateOf(false) }
+    var signed by remember { mutableStateOf(false) }
+    var selectedRecipients by remember { mutableStateOf<MutableSet<CharSequence>>(mutableSetOf()) }
+
     val dragAndDropCallback = remember {
         object : DragAndDropTarget {
             override fun onDrop(event: DragAndDropEvent): Boolean {
@@ -143,8 +146,7 @@ fun SharkConversationContent(
                 }
 
                 uiState.addMessage(
-                    //Message(authorMe, clipData.getItemAt(0).text.toString(), timeNow)
-                    clipData.getItemAt(0).text.toString(),"text/plain"
+                    clipData.getItemAt(0).text.toString(),"text/plain",signed,encrypted,selectedRecipients
                 )
 
                 return true
@@ -172,6 +174,9 @@ fun SharkConversationContent(
             }
         }
     }
+
+
+
 
     Scaffold(
         topBar = {
@@ -209,7 +214,7 @@ fun SharkConversationContent(
             UserInput(
                 onMessageSent = { content ->
                     uiState.addMessage(
-                        content,"text/plain"
+                        content,"text/plain",signed,encrypted,selectedRecipients
                     )
                 },
                 resetScroll = {
@@ -271,6 +276,16 @@ fun SharkChannelNameBar(
                     .height(24.dp),
                 contentDescription = stringResource(id = R.string.info)
             )
+            // Messages Refresh Icon
+            Icon(
+                imageVector = Icons.Outlined.Refresh,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .clickable(onClick = { SharkDataHelper.reloadMessages(channelUri) })
+                    .padding(horizontal = 12.dp, vertical = 16.dp)
+                    .height(24.dp),
+                contentDescription = stringResource(id = R.string.info) //@todo fix string
+            )
         }
     )
 }
@@ -289,7 +304,7 @@ fun SNMessages(
 
         val authorMe = stringResource(id = R.string.author_me)
         LazyColumn(
-            //reverseLayout = true,
+            reverseLayout = true,
             state = scrollState,
             modifier = Modifier
                 .testTag(SNConversationTestTag)
@@ -432,7 +447,7 @@ private fun SNAuthorNameTimestamp(msg: SharkNetMessage) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = msg.creationTime.toString(),
+            text = SharkDataHelper.formatTime(msg.creationTime),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.alignBy(LastBaseline),
             color = MaterialTheme.colorScheme.onSurfaceVariant

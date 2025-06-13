@@ -49,12 +49,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import net.sharksystem.sharknetmessengerandroid.R
-import kotlin.math.abs
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,7 +104,7 @@ fun RecordButton(
             positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
             tooltip = {
                 RichTooltip {
-                    Text(stringResource(R.string.touch_and_hold_to_record))
+                    Text("record") //stringResource(R.string.touch_and_hold_to_record))
                 }
             },
             enableUserInput = false,
@@ -114,7 +112,7 @@ fun RecordButton(
         ) {
             Icon(
                 Icons.Default.Mic,
-                contentDescription = stringResource(R.string.record_message),
+                contentDescription = "record",//stringResource(R.string.record_message),
                 tint = iconColor.value,
                 modifier = modifier
                     .sizeIn(minWidth = 56.dp, minHeight = 6.dp)

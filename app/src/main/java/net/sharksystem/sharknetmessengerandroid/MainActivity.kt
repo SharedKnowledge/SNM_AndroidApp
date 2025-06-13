@@ -18,17 +18,10 @@ package net.sharksystem.sharknetmessengerandroid
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.material3.DrawerValue.Closed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDrawerState
@@ -38,23 +31,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import net.sharksystem.sharknetmessengerandroid.databinding.ContentMainBinding
 import kotlinx.coroutines.launch
+import net.sharksystem.sharknetmessengerandroid.databinding.ContentMainBinding
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import net.sharksystem.sharknetmessengerandroid.ui.MainViewModel
 import net.sharksystem.sharknetmessengerandroid.ui.components.Drawer
-import net.sharksystem.sharknetmessengerandroid.utils.Networking
-import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
-import kotlin.getValue
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
@@ -65,24 +53,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets -> insets }
 
-        // Example: Check SharedPreferences
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        //val isUsernameSet = prefs.getBoolean("peer_name_set", false)
-
-        if(!SharkNetApp.load(this)) {
-            val intent = Intent(this, OnboardingActivity::class.java)
-            startActivity(intent)
-            finish()
-            return
+        if(SharkNetApp.singleton == null) {
+            if(!SharkNetApp.load(this)) {
+                val intent = Intent(this, OnboardingActivity::class.java)
+                startActivity(intent)
+                finish()
+                return
+            }
         }
-        /* //@todo deprecate isUsernameSet
-        if (!isUsernameSet) {
-            val intent = Intent(this, OnboardingActivity::class.java)
-            startActivity(intent)
-            finish()
-            return
-        }
-        */
 
         setContentView(
             ComposeView(this).apply {
