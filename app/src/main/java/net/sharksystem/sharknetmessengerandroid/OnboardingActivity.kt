@@ -1,4 +1,3 @@
-// In OnboardingActivity.kt
 package net.sharksystem.sharknetmessengerandroid
 
 import android.app.Activity

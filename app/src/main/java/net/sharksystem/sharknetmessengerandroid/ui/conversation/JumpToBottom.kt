@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+// Modified from the Official Jetpack Compose samples, provided by the Android Open Source Project
+// Original source: https://github.com/android/compose-samples
+// Changes:
+
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import androidx.compose.animation.core.animateDp
