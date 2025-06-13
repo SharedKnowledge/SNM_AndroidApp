@@ -115,8 +115,6 @@ fun SharkConversationContent(
     modifier: Modifier = Modifier,
     onNavIconPressed: () -> Unit = { }
 ) {
-    val authorMe = stringResource(R.string.author_me)
-    val timeNow = stringResource(id = R.string.now)
 
     val scrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
@@ -310,8 +308,6 @@ fun SNMessages(
                 .fillMaxSize()
         ) {
             for (index in messages.indices) {
-                val prevAuthor = messages.getOrNull(index - 1)?.sender
-                val nextAuthor = messages.getOrNull(index + 1)?.sender
                 val content = messages[index]
 
                 var formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
@@ -369,11 +365,6 @@ fun SNMessage(
     msg: SharkNetMessage,
     isUserMe: Boolean,
 ) {
-    val borderColor = if (isUserMe) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.tertiary
-    }
 
     val spaceBetweenAuthors = Modifier.padding(top = 8.dp)
     Row(modifier = spaceBetweenAuthors) {

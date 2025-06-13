@@ -18,8 +18,7 @@ class SharkDataHelper {
             val sharkNetMessages = (SharkNetApp.Companion.singleton?.
             getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
                     as? SharkNetMessengerComponentImpl)?.
-            getChannel(uri)?.
-            getMessages()
+            getChannel(uri)?.messages
 
             val size = sharkNetMessages!!.size()
             for (i in 0 until size) {
@@ -35,8 +34,7 @@ class SharkDataHelper {
             val sharkNetMessages = (SharkNetApp.Companion.singleton?.
             getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
                     as? SharkNetMessengerComponentImpl)?.
-            getChannel(uri)?.
-            getMessages()
+            getChannel(uri)?.messages
             return sharkNetMessages!!.size()
         }
 

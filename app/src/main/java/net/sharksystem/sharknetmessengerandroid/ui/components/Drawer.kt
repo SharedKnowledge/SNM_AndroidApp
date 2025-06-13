@@ -57,8 +57,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.sharksystem.sharknetmessengerandroid.R
 //import com.example.compose.jetchat.widget.WidgetReceiver
-import net.sharksystem.sharknetmessengerandroid.ui.data.colleagueProfile
-import net.sharksystem.sharknetmessengerandroid.ui.data.meProfile
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkColleagueProfile
+import net.sharksystem.sharknetmessengerandroid.ui.data.sharkMeProfile
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 //copy profile to shark
 
@@ -84,16 +84,16 @@ fun DrawerContent(
         DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
         DrawerItemHeader("Recent Profiles")
         ProfileItem(
-            "Ali Conors (you)", meProfile.photo,
-            selectedMenu == meProfile.userId
+            "Ali Conors (you)", sharkMeProfile.photo,
+            selectedMenu == sharkMeProfile.userId
         ) {
-            onProfileClicked(meProfile.userId)
+            onProfileClicked(sharkMeProfile.userId)
         }
         ProfileItem(
-            "Taylor Brooks", colleagueProfile.photo,
-            selectedMenu == colleagueProfile.userId
+            "Taylor Brooks", sharkColleagueProfile.photo,
+            selectedMenu == sharkColleagueProfile.userId
         ) {
-            onProfileClicked(colleagueProfile.userId)
+            onProfileClicked(sharkColleagueProfile.userId)
         }
 //        if (widgetAddingIsSupported(LocalContext.current)) {
 //            DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
