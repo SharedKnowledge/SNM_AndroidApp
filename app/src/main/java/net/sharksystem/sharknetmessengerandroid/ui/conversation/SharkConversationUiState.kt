@@ -50,9 +50,6 @@ class SharkConversationUiState(
             encrypted
         )
 
-        while (_messages.size >= SharkDataHelper.countMessages(this.channelUri)) {
-            Thread.sleep(100)
-        }
         val newMessages: List<SharkNetMessage> = SharkDataHelper.reloadMessages(channelUri)
         _messages.clear()
         _messages.addAll(newMessages)

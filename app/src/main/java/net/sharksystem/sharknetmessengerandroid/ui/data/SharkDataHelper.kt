@@ -26,16 +26,8 @@ class SharkDataHelper {
                 messages.add(message)
             }
             Log.d("SharkDebug", "SharkNet messages reloaded")
-
+            //@todo sharknetmessages reversed already integrated
             return messages.reversed()
-        }
-
-        fun countMessages(uri: CharSequence): Int {
-            val sharkNetMessages = (SharkNetApp.Companion.singleton?.
-            getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
-                    as? SharkNetMessengerComponentImpl)?.
-            getChannel(uri)?.messages
-            return sharkNetMessages!!.size()
         }
 
         fun transformToTime(timeInMillis: Long): ZonedDateTime {
