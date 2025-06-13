@@ -29,7 +29,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.MainViewModel
-import net.sharksystem.sharknetmessengerandroid.ui.data.exampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 

@@ -6,21 +6,16 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
-import net.sharksystem.SharkException
 import net.sharksystem.SharkPeer
 import net.sharksystem.SharkPeerFS
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentFactory
 import net.sharksystem.asap.ASAP
-import net.sharksystem.asap.ASAPSecurityException
 import net.sharksystem.asap.android.Util
 import net.sharksystem.asap.android.apps.ASAPAndroidPeer
-import net.sharksystem.asap.crypto.InMemoASAPKeyStore
 import net.sharksystem.pki.AndroidSharkPKIComponentFactory
 import net.sharksystem.pki.AndroidSharkPKIComponentImpl
 import net.sharksystem.pki.SharkPKIComponent
-import net.sharksystem.pki.SharkPKIComponentFactory
-import kotlin.math.sin
 
 
 /**
@@ -53,17 +48,10 @@ class SharkNetApp {
          */
         fun initialize(context: Context, peerName: String) {
             if (peerName == "") throw IllegalArgumentException("peerName must not be empty")
-
-            val sharedPref: SharedPreferences = context.getSharedPreferences(
-                PREFERENCES_FILE, Context.MODE_PRIVATE
-            )
-            val existingPeerName = sharedPref.getString(PF_PEER_NAME, null)
-            val existingPeerID = sharedPref.getString(PF_PEER_ID, null)
-
-            if (existingPeerName != null && existingPeerID != null) {
-                singleton = SharkNetApp(context, existingPeerName)
-            } else {
-                singleton = SharkNetApp(context,peerName)
+            Log.d("SharkDebug", "SharkNet App initiliaze called $peerName")
+            if (SharkNetApp.singleton == null) {
+                singleton = SharkNetApp(context, peerName)
+                Log.d("SharkDebug", "SharkNet App created called $peerName")
             }
         }
 
@@ -72,10 +60,10 @@ class SharkNetApp {
                 PREFERENCES_FILE, Context.MODE_PRIVATE
             )
             val existingPeerName = sharedPref.getString(PF_PEER_NAME, null)
-            val existingPeerID = sharedPref.getString(PF_PEER_ID, null)
-
-            if (existingPeerName != null && existingPeerID != null) {
+            Log.d("SharkDebug", "SharkNet App load called sharedpreferences - $existingPeerName")
+            if (existingPeerName != null ) {
                 singleton = SharkNetApp(context, existingPeerName)
+                Log.d("SharkDebug", "SharkNet App created called sharedpreferences - $existingPeerName")
                 return true
             } else {
                 return false

@@ -17,7 +17,6 @@
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import androidx.compose.runtime.toMutableStateList
-import kotlinx.coroutines.awaitAll
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
@@ -32,19 +31,27 @@ class SharkConversationUiState(
     private val _messages: MutableList<SharkNetMessage> = initialMessages.toMutableStateList()
     val messages: List<SharkNetMessage> = _messages
 
-    fun addMessage(msg: String, msgType: String) {
+    fun addMessage(
+        msg: String,
+        msgType: String,
+        signed: Boolean,
+        encrypted: Boolean,
+        selectedRecipients: MutableSet<CharSequence>? = mutableSetOf()
+    ) {
         val messengerComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
         val messengerComponentImpl = messengerComponent as? SharkNetMessengerComponentImpl
+
         messengerComponentImpl?.sendSharkMessage(
             msgType, //"text/plain"
             msg.toByteArray(),
             this.channelUri,
-            true
+            selectedRecipients,
+            signed,
+            encrypted
         )
-        Thread.sleep(1000) //@todo transform instead of sleep to a wait for messages to be updated
+
         val newMessages: List<SharkNetMessage> = SharkDataHelper.reloadMessages(channelUri)
         _messages.clear()
         _messages.addAll(newMessages)
-        //_messages.addAll(newMessages)
     }
 }
