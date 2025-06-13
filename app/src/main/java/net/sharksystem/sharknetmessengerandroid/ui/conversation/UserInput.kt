@@ -18,6 +18,7 @@ package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
@@ -30,11 +31,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -451,7 +455,41 @@ private fun UserInputText(
     focusState: Boolean
 ) {
     val swipeOffset = remember { mutableStateOf(0f) }
+    var isRecordingMessage by remember { mutableStateOf(false) }
     val a11ylabel = stringResource(id = R.string.textfield_desc)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        AnimatedContent(
+            targetState = isRecordingMessage,
+            label = "text-field",
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+        ) { recording -> //todo Recording und related löschen,
+            Box(Modifier.fillMaxSize()) {
+                if (recording) {
+                    //RecordingIndicator { swipeOffset.value }
+                } else {
+                    UserInputTextField(
+                        textFieldValue,
+                        onTextChanged,
+                        onTextFieldFocused,
+                        keyboardType,
+                        focusState,
+                        onMessageSent,
+                        Modifier.fillMaxWidth().semantics {
+                            contentDescription = a11ylabel
+                            keyboardShownProperty = keyboardShown
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
