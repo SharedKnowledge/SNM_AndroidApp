@@ -27,16 +27,23 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.StateFlow
+import androidx.compose.runtime.getValue
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 @Composable
 fun Drawer(
     drawerState: DrawerState = rememberDrawerState(initialValue = Closed),
     selectedMenu: String,
+    channelsFlow: StateFlow<List<String>>,
     onProfileClicked: (String) -> Unit,
     onChatClicked: (String) -> Unit,
     content: @Composable () -> Unit,
 ) {
+    val channels by channelsFlow.collectAsStateWithLifecycle()
+
     SharkNetMessengerAndroidTheme {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -49,7 +56,8 @@ fun Drawer(
                     DrawerContent(
                         onProfileClicked = onProfileClicked,
                         onChatClicked = onChatClicked,
-                        selectedMenu = selectedMenu
+                        selectedMenu = selectedMenu,
+                        channels = channels
                     )
                 }
             },

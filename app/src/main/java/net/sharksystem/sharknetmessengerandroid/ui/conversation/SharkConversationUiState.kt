@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+// Modified from the Official Jetpack Compose samples, provided by the Android Open Source Project
+// Original source: https://github.com/android/compose-samples
+// Changes:
+//@todo @Monty pls add changes to comment if needed
+
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import androidx.compose.runtime.toMutableStateList
@@ -27,6 +32,10 @@ class SharkConversationUiState(
     val channelUri: String,
     initialMessages: List<SharkNetMessage>
 ) {
+    constructor(channelUri: String) : this(
+        channelUri,
+        SharkDataHelper.reloadMessages(channelUri)
+    )
     //private val initialMessages: List<SharkNetMessage> = SharkData.reloadMessages(channelUri)
     private val _messages: MutableList<SharkNetMessage> = initialMessages.toMutableStateList()
     val messages: List<SharkNetMessage> = _messages
@@ -42,7 +51,7 @@ class SharkConversationUiState(
         val messengerComponentImpl = messengerComponent as? SharkNetMessengerComponentImpl
 
         messengerComponentImpl?.sendSharkMessage(
-            msgType, //"text/plain"
+            msgType,
             msg.toByteArray(),
             this.channelUri,
             selectedRecipients,

@@ -92,12 +92,14 @@ class MainActivity : AppCompatActivity() {
                     Drawer(
                         drawerState = drawerState,
                         selectedMenu = selectedMenu,
+                        channelsFlow = viewModel.channels,
                         onChatClicked = {
                             findNavController().popBackStack(R.id.nav_home, false)
                             scope.launch {
                                 drawerState.close()
                             }
                             selectedMenu = it
+                            viewModel.setCurrentChannelUri(it)
                         },
                         onProfileClicked = {
                             val bundle = bundleOf("userId" to it)

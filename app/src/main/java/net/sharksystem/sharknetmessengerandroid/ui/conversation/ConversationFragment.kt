@@ -33,8 +33,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.MainViewModel
-import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
 
 class ConversationFragment : Fragment() {
 
@@ -48,10 +49,11 @@ class ConversationFragment : Fragment() {
         layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
 
         setContent {
+            val uiState by activityViewModel.sharkUiState.collectAsStateWithLifecycle()
+
             SharkNetMessengerAndroidTheme {
                 SharkConversationContent(
-                //ConversationContent(
-                    uiState = sharkExampleUiState,
+                    uiState = uiState,
                     navigateToProfile = { user ->
                         // Click callback
                         val bundle = bundleOf("userId" to user)
@@ -62,6 +64,7 @@ class ConversationFragment : Fragment() {
                     },
                     onNavIconPressed = {
                         activityViewModel.openDrawer()
+                        activityViewModel.loadChannels()
                     }
                 )
             }

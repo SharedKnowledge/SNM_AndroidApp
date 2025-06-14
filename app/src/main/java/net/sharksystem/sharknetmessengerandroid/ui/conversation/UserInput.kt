@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+// Modified from the Official Jetpack Compose samples, provided by the Android Open Source Project
+// Original source: https://github.com/android/compose-samples
+// Changes:
+//@todo @Monty pls add changes to comment if needed
+
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup

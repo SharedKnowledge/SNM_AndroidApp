@@ -94,12 +94,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.sharknetmessengerandroid.R
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import net.sharksystem.sharknetmessengerandroid.ui.components.AppBar
 import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
-import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 import java.time.format.DateTimeFormatter
 
@@ -282,7 +283,10 @@ fun SharkChannelNameBar(
                 imageVector = Icons.Outlined.Refresh,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
-                    .clickable(onClick = { SharkDataHelper.reloadMessages(channelUri) })
+                    .clickable(onClick = {
+                        SharkDataHelper.reloadMessages(channelUri)
+                        SharkNetApp.dummymethod()
+                    })
                     .padding(horizontal = 12.dp, vertical = 16.dp)
                     .height(24.dp),
                 contentDescription = stringResource(id = R.string.info) //@todo fix string
@@ -411,7 +415,8 @@ private fun SNAuthorNameTimestamp(msg: SharkNetMessage) {
     // Combine author and timestamp for a11y.
     Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
         Text(
-            text = msg.sender.toString(),
+            text = SharkNetApp.getPeerNameWithID(msg.sender.toString()),
+            //text = msg.sender.toString(),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .alignBy(LastBaseline)
@@ -516,16 +521,19 @@ fun SNClickableMessage(
     )
 }
 
+/*
 @Preview
 @Composable
 fun SNConversationPreview() {
     SharkNetMessengerAndroidTheme {
         SharkConversationContent(
-            uiState = sharkExampleUiState,
+            uiState = sharkUiState,
             navigateToProfile = { }
         )
     }
 }
+
+ */
 
 @Preview
 @Composable

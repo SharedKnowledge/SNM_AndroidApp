@@ -60,33 +60,43 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.sharksystem.sharknetmessengerandroid.R
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 //import com.example.compose.jetchat.widget.WidgetReceiver
 import net.sharksystem.sharknetmessengerandroid.ui.data.sharkColleagueProfile
 import net.sharksystem.sharknetmessengerandroid.ui.data.sharkMeProfile
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
+
+
 //copy profile to shark
 
 @Composable
 fun DrawerContent(
+    channels: List<String>,
     onProfileClicked: (String) -> Unit,
     onChatClicked: (String) -> Unit,
     selectedMenu: String = "composers"
 ) {
+
     // Use windowInsetsTopHeight() to add a spacer which pushes the drawer content
     // below the status bar (y-axis)
     Column {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         DrawerHeader()
         DividerItem()
-        DrawerItemHeader("Chats")
-        ChatItem("composers", selectedMenu == "composers") {
-            onChatClicked("composers")
-        }
-        ChatItem("droidcon-nyc", selectedMenu == "droidcon-nyc") {
-            onChatClicked("droidcon-nyc")
+        DrawerItemHeader("Channels")
+//        SharkNetApp.getMessengerComponent()?.channelUris?.forEach { channelUri ->
+//            val channelName = channelUri.toString()
+//            ChatItem(channelName, selectedMenu == channelUri.toString()) {
+//                onChatClicked(channelUri.toString())
+//            }
+//        }
+        channels.forEach { channelUri ->
+            ChatItem(channelUri, selectedMenu == channelUri) {
+                onChatClicked(channelUri)
+            }
         }
         DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
-        DrawerItemHeader("Recent Profiles")
+        DrawerItemHeader("Persons")
         ProfileItem(
             "Ali Conors (you)", sharkMeProfile.photo,
             selectedMenu == sharkMeProfile.userId
@@ -237,7 +247,7 @@ fun DrawerPreview() {
     SharkNetMessengerAndroidTheme {
         Surface {
             Column {
-                DrawerContent({}, {})
+                //DrawerContent({}, {})
             }
         }
     }
@@ -249,7 +259,7 @@ fun DrawerPreviewDark() {
     SharkNetMessengerAndroidTheme(darkTheme = true) {
         Surface {
             Column {
-                DrawerContent({}, {})
+                //DrawerContent({}, {})
             }
         }
     }

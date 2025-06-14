@@ -10,6 +10,7 @@ import net.sharksystem.SharkPeer
 import net.sharksystem.SharkPeerFS
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentFactory
+import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.asap.ASAP
 import net.sharksystem.asap.android.Util
 import net.sharksystem.asap.android.apps.ASAPAndroidPeer
@@ -49,7 +50,7 @@ class SharkNetApp {
         fun initialize(context: Context, peerName: String) {
             if (peerName == "") throw IllegalArgumentException("peerName must not be empty")
             Log.d("SharkDebug", "SharkNet App initiliaze called $peerName")
-            if (SharkNetApp.singleton == null) {
+            if (singleton == null) {
                 singleton = SharkNetApp(context, peerName)
                 Log.d("SharkDebug", "SharkNet App created called $peerName")
             }
@@ -69,6 +70,29 @@ class SharkNetApp {
                 return false
             }
         }
+
+        fun getMessengerComponent() : SharkNetMessengerComponentImpl? {
+            return (singleton!!.getPeer().getComponent(SharkNetMessengerComponent::class.java)
+                    as? SharkNetMessengerComponentImpl)
+        }
+
+        fun getPeerName(peerID: CharSequence) : String {
+            if (peerID == singleton!!.peerID) return singleton!!.getPeer().sharkPeerName.toString()
+            //@todo check why persons is 0 if there is no other persons (self not listed)
+            val sharkPKI = singleton!!.getPeer().getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl
+            return sharkPKI.getPersonValuesByID(peerID).name.toString()
+        }
+
+        fun getPeerNameWithID(peerID: CharSequence) : String {
+            return "${getPeerName(peerID)}_${peerID}"
+        }
+
+        fun dummymethod() {
+            //val pki =  singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
+            //Log.d("SharkDebug",pki?.numberOfPersons.toString())
+            getMessengerComponent()!!.createChannel("sn://snm_android_test3","sn://snm_android_test3")
+        }
+
     }
     /**
      * Constructor for [SharkNetApp]. Creates a SharkPeer instance and the app data folder.

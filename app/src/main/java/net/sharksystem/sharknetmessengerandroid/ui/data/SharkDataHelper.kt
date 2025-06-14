@@ -15,10 +15,7 @@ class SharkDataHelper {
     companion object {
         fun reloadMessages(uri: CharSequence): List<SharkNetMessage> {
             val messages = mutableListOf<SharkNetMessage>()
-            val sharkNetMessages = (SharkNetApp.Companion.singleton?.
-            getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
-                    as? SharkNetMessengerComponentImpl)?.
-            getChannel(uri)?.messages
+            val sharkNetMessages = SharkNetApp.getMessengerComponent()?.getChannel(uri)?.messages
 
             val size = sharkNetMessages!!.size()
             for (i in 0 until size) {
@@ -44,5 +41,6 @@ class SharkDataHelper {
         fun getDate(timeinMillis: Long): LocalDate {
             return transformToTime(timeinMillis).toLocalDate()
         }
+
     }
 }

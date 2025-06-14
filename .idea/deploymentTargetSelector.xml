@@ -13,7 +13,7 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="InitActivity">
+      <SelectionState runConfigName="DrawerPreviewDark">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
