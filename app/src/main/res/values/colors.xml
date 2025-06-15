@@ -26,6 +26,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="sharkRed">#D1431D</color>
 
     <!-- Light -->
     <color name="blue500">#0540F2</color>
@@ -37,8 +38,7 @@
     <color name="yellow400">#F6E547</color>
 
     <!-- Logo -->
-    <color name="yellow_logo">@color/yellow700</color>
-    <color name="blue_logo">@color/blue500</color>
+    <color name="shark_red_logo">@color/sharkRed</color>
 
     <!-- Status bar -->
     <color name="black30">#4D000000</color>

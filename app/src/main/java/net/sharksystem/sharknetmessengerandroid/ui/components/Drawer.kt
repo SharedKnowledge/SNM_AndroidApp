@@ -114,11 +114,17 @@ private fun DrawerHeader() {
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
-        Image(
-            painter = painterResource(id = R.drawable.shark_icon),
-            contentDescription = null,
+        Text(
+            text = stringResource(id = R.string.app_name),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 8.dp)
         )
+//        Image(
+//            painter = painterResource(id = R.drawable.shark_hai_rot),
+//            contentDescription = null,
+//            modifier = Modifier.padding(start = 8.dp)
+//        )
     }
 }
 
@@ -161,7 +167,7 @@ private fun ChatItem(text: String, selected: Boolean, onChatClicked: () -> Unit)
             MaterialTheme.colorScheme.onSurfaceVariant
         }
         Icon(
-            painter = painterResource(id = R.drawable.shark_icon),
+            painter = painterResource(id = R.drawable.shark_hai_rot),
             tint = iconTint,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
             contentDescription = null

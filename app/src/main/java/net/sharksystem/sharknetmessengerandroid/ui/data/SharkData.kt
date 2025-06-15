@@ -92,7 +92,7 @@ val sharkExampleUiState = SharkConversationUiState(
  */
 val sharkColleagueProfile = ProfileScreenState(
     userId = "12345",
-    photo = R.drawable.ic_launcher_background,
+    photo = R.drawable.launcher_icon_background,
     name = "Taylor Brooks",
     status = "Away",
     displayName = "taylor",
@@ -107,7 +107,7 @@ val sharkColleagueProfile = ProfileScreenState(
  */
 val sharkMeProfile = ProfileScreenState(
     userId = "me",
-    photo = R.drawable.shark_icon,
+    photo = R.drawable.shark_hai_rot,
     name = "Ali Conors",
     status = "Online",
     displayName = "aliconors",

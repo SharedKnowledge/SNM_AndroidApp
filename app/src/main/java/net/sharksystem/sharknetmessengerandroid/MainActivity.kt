@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.os.bundleOf
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -54,6 +55,7 @@ class MainActivity : AppCompatActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets -> insets }
 
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        splashScreen.setKeepOnScreenCondition { false }
         setContentView(
             ComposeView(this).apply {
                 consumeWindowInsets = false

@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -47,9 +48,9 @@ fun SharkIcon(
     }
     Box(modifier = modifier.then(semantics)) {
         Icon(
-            // TODO: Replace the icon with a vector asset
-            painter = painterResource(id = R.drawable.shark_icon),
+            painter = painterResource(id = R.drawable.shark_hai_rot),
             contentDescription = null,
+            tint = Color.Unspecified
         )
     }
 }

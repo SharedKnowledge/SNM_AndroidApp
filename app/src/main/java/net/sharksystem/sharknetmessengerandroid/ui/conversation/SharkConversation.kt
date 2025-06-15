@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
@@ -50,24 +51,31 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -92,6 +100,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -101,6 +111,8 @@ import net.sharksystem.sharknetmessengerandroid.ui.components.AppBar
 import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
 import net.sharksystem.sharknetmessengerandroid.ui.data.sharkExampleUiState
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
+import java.time.Instant
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
@@ -463,6 +475,8 @@ fun SNChatItemBubble(
     isUserMe: Boolean,
     authorClicked: (String) -> Unit
 ) {
+    // State für das Anzeigen des Detail-Modals
+    var showMessageDetails by remember { mutableStateOf(false) }
 
     val backgroundBubbleColor = if (isUserMe) {
         MaterialTheme.colorScheme.primary
@@ -470,10 +484,20 @@ fun SNChatItemBubble(
         MaterialTheme.colorScheme.surfaceVariant
     }
 
+    // Wenn showMessageDetails true ist, zeige das Modal an
+    if (showMessageDetails) {
+        MessageDetailModal(
+            message = message,
+            onDismiss = { showMessageDetails = false }
+        )
+    }
+
     Column {
         Surface(
             color = backgroundBubbleColor,
-            shape = ChatBubbleShape
+            shape = ChatBubbleShape,
+            // Mache die gesamte Surface klickbar
+            modifier = Modifier.clickable { showMessageDetails = true }
         ) {
             SNClickableMessage(
                 message = message,
@@ -542,3 +566,133 @@ fun SNDayHeaderPrev() {
 }
 
 private val JumpToBottomThreshold = 56.dp
+
+/**
+ * Zeigt detaillierte Informationen über eine Nachricht in einem Bottom Sheet Modal an
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageDetailModal(
+    message: SharkNetMessage,
+    onDismiss: () -> Unit
+) {
+    val modalBottomSheetState = rememberModalBottomSheetState()
+    val scrollState = rememberScrollState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = modalBottomSheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .verticalScroll(scrollState)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Nachrichtendetails",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f)
+                )
+
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = "Schließen"
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MessageDetailCard(
+                title = "Nachrichteninhalt",
+                content = String(message.content, Charsets.UTF_8)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Zeit formatieren
+            val instant = Instant.ofEpochMilli(message.creationTime)
+            val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+                .withZone(ZoneId.systemDefault())
+            val formattedTime = formatter.format(instant)
+
+            MessageDetailCard(
+                title = "Zeitstempel",
+                content = formattedTime
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MessageDetailCard(
+                title = "Absender",
+                content = message.sender.toString()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MessageDetailCard(
+                title = "Empfänger",
+                content = message.recipients.toString()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MessageDetailCard(
+                title = "Content Type",
+                content = message.contentType.toString()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MessageDetailCard(
+                title = "Sicherheitsinfo",
+                content = "Verifiziert: ${message.verified()}\n" +
+                        "Signiert: ${message.signed()}\n" +
+                        "Verschlüsselt: ${message.encrypted()}\n" +
+                        "Konnte entschlüsselt werden: ${message.couldBeDecrypted()}"
+            )
+
+            // Extra Platz am Ende hinzufügen
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+/**
+ * Hilfsfunktion zum Anzeigen von Details in einem Kartenformat
+ */
+@Composable
+fun MessageDetailCard(
+    title: String,
+    content: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = content,
+                style = MaterialTheme.typography.bodyMedium,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
