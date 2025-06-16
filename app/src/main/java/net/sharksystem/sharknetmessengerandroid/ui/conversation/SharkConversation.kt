@@ -24,6 +24,7 @@ package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
 import android.content.ClipDescription
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -86,6 +87,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
@@ -137,6 +139,7 @@ fun SharkConversationContent(
     var encrypted by remember { mutableStateOf(false) }
     var signed by remember { mutableStateOf(false) }
     var selectedRecipients by remember { mutableStateOf<MutableSet<CharSequence>>(mutableSetOf()) }
+    var showError by remember { mutableStateOf(false) }
 
     val dragAndDropCallback = remember {
         object : DragAndDropTarget {
@@ -178,9 +181,6 @@ fun SharkConversationContent(
         }
     }
 
-
-
-
     Scaffold(
         topBar = {
             SharkChannelNameBar(
@@ -216,9 +216,14 @@ fun SharkConversationContent(
             )
             UserInput(
                 onMessageSent = { content, descriptor, signed, encrypted, selectedRecipients ->
-                    uiState.addMessage(
-                        content, descriptor.toString(),signed,encrypted,selectedRecipients
-                    )
+                    if (encrypted && selectedRecipients.isEmpty()) {
+                        showError = true
+                        return@UserInput
+                    } else {
+                        uiState.addMessage(
+                            content, descriptor.toString(), signed, encrypted, selectedRecipients
+                        )
+                    }
                 },
                 resetScroll = {
                     scope.launch {
@@ -229,6 +234,14 @@ fun SharkConversationContent(
                 // navigation bar
                 modifier = Modifier.navigationBarsPadding().imePadding()
             )
+        }
+        if (showError) {
+            Toast.makeText(
+                LocalContext.current,
+                "Impossible to send encrypted message without recipients",
+                Toast.LENGTH_SHORT,
+            ).show()
+            showError = false
         }
     }
 }

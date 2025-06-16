@@ -22,6 +22,9 @@
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
+import RecipientSelectionScreen
+import android.renderscript.ScriptGroup
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -64,6 +67,7 @@ import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.sharp.AttachFile
 import androidx.compose.material.icons.twotone.Approval
+import androidx.compose.material.icons.twotone.People
 import androidx.compose.material.icons.twotone.VerifiedUser
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -93,6 +97,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -106,15 +111,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.selects.select
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
+import net.sharksystem.asap.persons.PersonValues
+import net.sharksystem.asap.persons.PersonValuesImpl
+import net.sharksystem.pki.AndroidSharkPKIComponentImpl
+import net.sharksystem.pki.SharkPKIComponent
 import net.sharksystem.sharknetmessengerandroid.R
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
+import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 enum class InputSelector {
     NONE,
     DM,
     EMOJI,
-    PHONE,
+    RECIPIENTS,
     FILE,
     ENCRYPTED,
     SIGNED,
@@ -147,6 +159,8 @@ fun UserInput(
     var signed by rememberSaveable { mutableStateOf(true) }
     var recipientSet = mutableSetOf<CharSequence>()
     var contentDescriptor = rememberSaveable { ContentDescriptors.CHAR }
+    var showError by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     // Intercept back navigation if there's a InputSelector visible
     if (currentInputSelector != InputSelector.NONE) {
@@ -159,6 +173,7 @@ fun UserInput(
 
     // Used to decide if the keyboard should be shown
     var textFieldFocusState by remember { mutableStateOf(false) }
+
 
     Surface(tonalElevation = 2.dp, contentColor = MaterialTheme.colorScheme.secondary) {
         Column(modifier = modifier) {
@@ -184,6 +199,7 @@ fun UserInput(
                 },
                 focusState = textFieldFocusState
             )
+
             UserInputSelector(
                 onSelectorChange = { selector ->
                     if (selector == InputSelector.ENCRYPTED) {
@@ -196,16 +212,33 @@ fun UserInput(
                 },
                 sendMessageEnabled = textState.text.isNotBlank(),
                 onMessageSent = {
-                    onMessageSent(textState.text, contentDescriptor, signed, encrypted, recipientSet)
-                    // Reset text field and close keyboard
+                if (encrypted && recipientSet.isEmpty()) {
+                    showError = true
+                } else {
+                    onMessageSent(
+                        textState.text,
+                        contentDescriptor,
+                        signed,
+                        encrypted,
+                        recipientSet
+                    )
                     textState = TextFieldValue()
-                    // Move scroll to bottom
                     resetScroll()
                     dismissKeyboard()
-                },
+                }
+        },
                 currentInputSelector = currentInputSelector,
-                encrypted = encrypted
+                encrypted = encrypted,
+                signed = signed,
+                modifier = Modifier,
             )
+            if (showError)
+                Toast.makeText(
+                    context,
+                    "Please select a recipient to encrypt for.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            showError = false
             SelectorExpanded(
                 onCloseRequested = dismissKeyboard,
                 onTextAdded = { textState = textState.addText(it) },
@@ -250,6 +283,7 @@ private fun SelectorExpanded(
         when (currentSelector) {
             InputSelector.SIGNED,
             InputSelector.FILE -> AttachmentSelector()
+            InputSelector.RECIPIENTS,
             InputSelector.ENCRYPTED,
             InputSelector.EMOJI -> EmojiSelector(onTextAdded, focusRequester)
 
@@ -310,7 +344,12 @@ private fun UserInputSelector(
     encrypted: Boolean = false,
     signed: Boolean = true,
 ) {
-    Row(
+    var pki = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl
+    var persons = pki.getPersons() as PersonValuesImpl
+    var showRecipientDialog by remember { mutableStateOf(false) }
+    var recipientSet = mutableSetOf<CharSequence>()
+
+        Row(
         modifier = modifier
             .height(72.dp)
             .wrapContentHeight()
@@ -348,7 +387,22 @@ private fun UserInputSelector(
             selected = signed,
             description = "Toggle Signature",
         )
-
+        InputSelectorButton(
+            onClick = { showRecipientDialog = true },
+            icon = Icons.TwoTone.People,
+            selected = true,
+            description = "Select Recipients",
+        )
+        if (showRecipientDialog) {
+            RecipientSelectionScreen(
+                knownPeers = persons as Set<PersonValues>,
+                onSelectionConfirmed = { selectedPeers ->
+                    recipientSet = selectedPeers
+                    showRecipientDialog = false
+                },
+                onDismiss = { showRecipientDialog = false }
+            )
+        }
         val border = if (!sendMessageEnabled) {
             BorderStroke(
                 width = 1.dp,
@@ -380,29 +434,6 @@ private fun UserInputSelector(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
-    }
-}
-
-//Encrypt for peer, if left empty, encrypt for all peers
-@Composable
-private fun EncryptForPeer(
-    onPeerSelected: (String?) -> Unit,
-    onCloseRequested: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .height(320.dp)
-    ) {
-        Text(
-            text = "Encrypt for Peer: ",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-        //todo:
-        //Person to encrypt for
-        // there is a class called PersonStoreImplAndCertsWrapper that can be used to get the list of persons
     }
 }
 
