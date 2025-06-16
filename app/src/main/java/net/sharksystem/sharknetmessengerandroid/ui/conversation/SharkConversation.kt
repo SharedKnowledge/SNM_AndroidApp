@@ -95,7 +95,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import net.sharksystem.SharkPeer
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
@@ -485,7 +484,9 @@ fun SNChatItemBubble(
             SNClickableMessage(
                 message = message,
                 isUserMe = isUserMe,
-                authorClicked = authorClicked
+                recipientSet = message.recipients,
+                authorClicked = authorClicked,
+
             )
         }
     }
@@ -495,34 +496,46 @@ fun SNChatItemBubble(
 fun SNClickableMessage(
     message: SharkNetMessage,
     isUserMe: Boolean,
+    recipientSet: MutableSet<CharSequence>?,
     authorClicked: (String) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
-    val currentUserId = SharkNetApp.getPeerID()
-    val authorized =
+    val currentPeerId = getPeerId()
+    val authorized = recipientSet.isNullOrEmpty() || recipientSet.contains(currentPeerId) || message.sender == currentPeerId
 
-    val styledMessage = messageFormatter(
-        text = String(message.content, Charsets.UTF_8),
-        primary = isUserMe
-    )
+    if (authorized) {
+        val styledMessage = messageFormatter(
+            text = String(message.content, Charsets.UTF_8),
+            primary = isUserMe
+        )
 
-    ClickableText(
-        text = styledMessage,
-        style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
-        modifier = Modifier.padding(16.dp),
-        onClick = {
-            styledMessage
-                .getStringAnnotations(start = it, end = it)
-                .firstOrNull()
-                ?.let { annotation ->
-                    when (annotation.tag) {
-                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
-                        else -> Unit
+        ClickableText(
+            text = styledMessage,
+            style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
+            modifier = Modifier.padding(16.dp),
+            onClick = {
+                styledMessage
+                    .getStringAnnotations(start = it, end = it)
+                    .firstOrNull()
+                    ?.let { annotation ->
+                        when (annotation.tag) {
+                            SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                            SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
+                            else -> Unit
+                        }
                     }
-                }
-        }
-    )
+            }
+        )
+    }
+    else {
+        val encryptedMessageCharacters = listOf('@', '#', '$', '%', '!', '?', '*', '!', '@', '#', '$', '%')
+        val censored = message.content.decodeToString().map { encryptedMessageCharacters.random() }.joinToString()
+        Text(
+            text = censored,
+            style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
+            modifier = Modifier.padding(16.dp)
+        )
+    }
 }
 
 /*
@@ -551,6 +564,10 @@ fun SNChannelBarPrev() {
 @Composable
 fun SNDayHeaderPrev() {
     SNDayHeader("Aug 6")
+}
+
+private fun getPeerId(): String {
+    return SharkNetApp.Companion.singleton?.getPeer()?.peerID.toString()
 }
 
 private val JumpToBottomThreshold = 56.dp
