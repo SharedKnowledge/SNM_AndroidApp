@@ -23,6 +23,7 @@
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
+import android.R.style
 import android.content.ClipDescription
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -44,6 +45,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
@@ -55,9 +57,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.twotone.Verified
+import androidx.compose.material.icons.twotone.VerifiedUser
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -491,6 +496,7 @@ private fun RowScope.DayHeaderLine() {
     )
 }
 
+
 @Composable
 fun SNChatItemBubble(
     message: SharkNetMessage,
@@ -504,7 +510,7 @@ fun SNChatItemBubble(
         MaterialTheme.colorScheme.surfaceVariant
     }
 
-    Column {
+    Box {
         Surface(
             color = backgroundBubbleColor,
             shape = ChatBubbleShape
@@ -517,8 +523,19 @@ fun SNChatItemBubble(
 
             )
         }
+        if (message.signed()) {
+            Icon(
+                imageVector = Icons.Filled.VerifiedUser,
+                contentDescription = "Signed Message",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .size(14.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-3).dp, y = (5).dp)
+            )
+            }
+        }
     }
-}
 
 @Composable
 fun SNClickableMessage(
