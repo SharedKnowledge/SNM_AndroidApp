@@ -21,12 +21,17 @@
 
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.toMutableStateList
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
+import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
+import java.io.FileInputStream
+import java.io.InputStream
 
 class SharkConversationUiState(
     val channelUri: String,
@@ -41,21 +46,26 @@ class SharkConversationUiState(
     val messages: List<SharkNetMessage> = _messages
 
     fun addMessage(
+        context: Context,
         msg: String,
         msgType: String,
         signed: Boolean,
         encrypted: Boolean,
-        selectedRecipients: MutableSet<CharSequence>? = mutableSetOf()
+        selectedRecipients: MutableSet<CharSequence>? = mutableSetOf(),
+        selectedFileUri: Uri? = null
     ) {
-        if (msg.isEmpty())
+        if (msg.isEmpty() && selectedFileUri == null)
             return
 
         val messengerComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
         val messengerComponentImpl = messengerComponent as? SharkNetMessengerComponentImpl
 
+        val fileContent: ByteArray? = selectedFileUri?.let { uri ->
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        }
         messengerComponentImpl?.sendSharkMessage(
             msgType,
-            msg.toByteArray(),
+            fileContent ?: msg.toByteArray(),
             this.channelUri,
             selectedRecipients,
             signed,

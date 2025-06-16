@@ -140,6 +140,9 @@ fun SharkConversationContent(
     var signed by remember { mutableStateOf(false) }
     var selectedRecipients by remember { mutableStateOf<MutableSet<CharSequence>>(mutableSetOf()) }
     var showError by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var selectedFileUri by remember { mutableStateOf<android.net.Uri?>(null) }
+
 
     val dragAndDropCallback = remember {
         object : DragAndDropTarget {
@@ -149,12 +152,18 @@ fun SharkConversationContent(
                 if (clipData.itemCount < 1) {
                     return false
                 }
+                val item = clipData.getItemAt(0)
+                selectedFileUri = item.uri
 
                 uiState.addMessage(
-                    clipData.getItemAt(0).text.toString(),
-                    contentDescriptor.toString(),signed,encrypted,selectedRecipients
+                    context,
+                    item.text.toString(),
+                    contentDescriptor.toString(),
+                    signed,
+                    encrypted,
+                    selectedRecipients,
+                    selectedFileUri
                 )
-
                 return true
             }
 
@@ -215,13 +224,19 @@ fun SharkConversationContent(
                 scrollState = scrollState
             )
             UserInput(
-                onMessageSent = { content, descriptor, signed, encrypted, selectedRecipients ->
+                onMessageSent = { content, descriptor, signed, encrypted, selectedRecipients, selectedFileUri ->
                     if (encrypted && selectedRecipients.isEmpty()) {
                         showError = true
                         return@UserInput
                     } else {
                         uiState.addMessage(
-                            content, descriptor.toString(), signed, encrypted, selectedRecipients
+                            context,
+                            content,
+                            descriptor.toString(),
+                            signed,
+                            encrypted,
+                            selectedRecipients,
+                            selectedFileUri
                         )
                     }
                 },

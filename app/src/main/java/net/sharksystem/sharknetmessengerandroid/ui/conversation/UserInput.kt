@@ -23,9 +23,11 @@ package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
 import RecipientSelectionScreen
-import android.renderscript.ScriptGroup
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -62,11 +64,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.sharp.AttachFile
-import androidx.compose.material.icons.twotone.Approval
 import androidx.compose.material.icons.twotone.People
 import androidx.compose.material.icons.twotone.VerifiedUser
 import androidx.compose.material3.Button
@@ -111,20 +111,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.selects.select
-import net.sharksystem.app.messenger.SharkNetMessage
-import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
-import net.sharksystem.asap.persons.PersonValues
-import net.sharksystem.asap.persons.PersonValuesImpl
 import net.sharksystem.pki.AndroidSharkPKIComponentImpl
 import net.sharksystem.pki.SharkPKIComponent
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
-import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 enum class InputSelector {
     NONE,
-    DM,
     EMOJI,
     RECIPIENTS,
     FILE,
@@ -149,7 +142,7 @@ fun UserInputPreview() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserInput(
-    onMessageSent: (String, ContentDescriptors, Boolean, Boolean, MutableSet<CharSequence>) -> Unit,
+    onMessageSent: (String, ContentDescriptors, Boolean, Boolean, MutableSet<CharSequence>, Uri?) -> Unit,
     modifier: Modifier = Modifier,
     resetScroll: () -> Unit = {},
 ) {
@@ -161,6 +154,7 @@ fun UserInput(
     var contentDescriptor = rememberSaveable { ContentDescriptors.CHAR }
     var showError by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
 
     // Intercept back navigation if there's a InputSelector visible
     if (currentInputSelector != InputSelector.NONE) {
@@ -191,7 +185,7 @@ fun UserInput(
                     textFieldFocusState = focused
                 },
                 onMessageSent = {
-                    onMessageSent(textState.text, contentDescriptor, signed, encrypted, recipientSet)
+                    onMessageSent(textState.text, contentDescriptor, signed, encrypted, recipientSet, selectedFileUri)
                     // Reset text field and close keyboard
                     textState = TextFieldValue()
                     // Move scroll to bottom
@@ -201,6 +195,7 @@ fun UserInput(
             )
 
             UserInputSelector(
+
                 onSelectorChange = { selector ->
                     if (selector == InputSelector.ENCRYPTED) {
                         encrypted = !encrypted
@@ -220,7 +215,8 @@ fun UserInput(
                         contentDescriptor,
                         signed,
                         encrypted,
-                        recipientSet
+                        recipientSet,
+                        selectedFileUri
                     )
                     textState = TextFieldValue()
                     resetScroll()
@@ -345,10 +341,17 @@ private fun UserInputSelector(
     signed: Boolean = true,
 ) {
     var pki = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl
-    var persons = pki.getPersons() as PersonValuesImpl
+    var persons = pki.getPersons()
     var showRecipientDialog by remember { mutableStateOf(false) }
     var recipientSet = mutableSetOf<CharSequence>()
-
+    var contentDescriptor = ContentDescriptors.CHAR
+    val context = LocalContext.current
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {uri: Uri? ->
+        selectedFileUri = uri
+    }
         Row(
         modifier = modifier
             .height(72.dp)
@@ -363,16 +366,10 @@ private fun UserInputSelector(
             description = stringResource(id = R.string.emoji_selector_bt_desc)
         )
         InputSelectorButton(
-            // on click set channel to existing private channel or create one.
-            onClick = { onSelectorChange(InputSelector.DM) },
-            icon = Icons.Outlined.Email,
-            selected = currentInputSelector == InputSelector.DM,
-            description = stringResource(id = R.string.dm_desc)
-        )
-        InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.FILE) },
+            onClick = { contentDescriptor = ContentDescriptors.FILE
+                      filePickerLauncher.launch("*/*") },
             icon = Icons.Sharp.AttachFile,
-            selected = currentInputSelector == InputSelector.FILE,
+            selected = false,
             description = stringResource(id = R.string.attach_file_desc)
         )
         InputSelectorButton(
@@ -383,19 +380,19 @@ private fun UserInputSelector(
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.SIGNED) },
-            icon = if (signed) Icons.TwoTone.VerifiedUser else Icons.TwoTone.Approval,
+            icon = if (signed) Icons.TwoTone.VerifiedUser else Icons.TwoTone.VerifiedUser,
             selected = signed,
             description = "Toggle Signature",
         )
         InputSelectorButton(
             onClick = { showRecipientDialog = true },
             icon = Icons.TwoTone.People,
-            selected = true,
+            selected = false,
             description = "Select Recipients",
         )
         if (showRecipientDialog) {
             RecipientSelectionScreen(
-                knownPeers = persons as Set<PersonValues>,
+                knownPeers = persons,
                 onSelectionConfirmed = { selectedPeers ->
                     recipientSet = selectedPeers
                     showRecipientDialog = false
