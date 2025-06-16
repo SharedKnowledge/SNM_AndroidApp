@@ -94,7 +94,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.sharknetmessengerandroid.R
@@ -134,6 +133,7 @@ fun SharkConversationContent(
         mutableStateOf(Color.Transparent)
     }
 
+    var contentDescriptor = ContentDescriptors.CHAR
     var encrypted by remember { mutableStateOf(false) }
     var signed by remember { mutableStateOf(false) }
     var selectedRecipients by remember { mutableStateOf<MutableSet<CharSequence>>(mutableSetOf()) }
@@ -148,7 +148,8 @@ fun SharkConversationContent(
                 }
 
                 uiState.addMessage(
-                    clipData.getItemAt(0).text.toString(),"text/plain",signed,encrypted,selectedRecipients
+                    clipData.getItemAt(0).text.toString(),
+                    contentDescriptor.toString(),signed,encrypted,selectedRecipients
                 )
 
                 return true
@@ -214,9 +215,9 @@ fun SharkConversationContent(
                 scrollState = scrollState
             )
             UserInput(
-                onMessageSent = { content ->
+                onMessageSent = { content, descriptor, signed, encrypted, selectedRecipients ->
                     uiState.addMessage(
-                        content,"text/plain",signed,encrypted,selectedRecipients
+                        content, descriptor.toString(),signed,encrypted,selectedRecipients
                     )
                 },
                 resetScroll = {

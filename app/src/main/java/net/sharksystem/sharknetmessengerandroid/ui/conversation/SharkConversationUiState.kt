@@ -47,6 +47,9 @@ class SharkConversationUiState(
         encrypted: Boolean,
         selectedRecipients: MutableSet<CharSequence>? = mutableSetOf()
     ) {
+        if (msg.isEmpty())
+            return
+
         val messengerComponent = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkNetMessengerComponent::class.java)
         val messengerComponentImpl = messengerComponent as? SharkNetMessengerComponentImpl
 

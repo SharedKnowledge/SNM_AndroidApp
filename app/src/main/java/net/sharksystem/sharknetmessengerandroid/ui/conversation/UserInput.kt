@@ -62,7 +62,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.LockOpen
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.sharp.AttachFile
 import androidx.compose.material.icons.twotone.Approval
 import androidx.compose.material.icons.twotone.VerifiedUser
 import androidx.compose.material3.Button
@@ -118,6 +118,10 @@ enum class InputSelector {
     ENCRYPTED,
     SIGNED,
 }
+enum class ContentDescriptors {
+    FILE,
+    CHAR
+}
 
 enum class EmojiStickerSelector {
     EMOJI,
@@ -132,7 +136,7 @@ fun UserInputPreview() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserInput(
-    onMessageSent: (String) -> Unit,
+    onMessageSent: (String, ContentDescriptors, Boolean, Boolean, MutableSet<CharSequence>) -> Unit,
     modifier: Modifier = Modifier,
     resetScroll: () -> Unit = {},
 ) {
@@ -140,7 +144,8 @@ fun UserInput(
     val dismissKeyboard = { currentInputSelector = InputSelector.NONE }
     var encrypted by rememberSaveable { mutableStateOf(false) }
     var signed by rememberSaveable { mutableStateOf(true) }
-    var encryptionPeer by rememberSaveable { mutableStateOf<String?>(null) }
+    var recipientSet = mutableSetOf<CharSequence>()
+    var contentDescriptor = rememberSaveable { ContentDescriptors.CHAR }
 
     // Intercept back navigation if there's a InputSelector visible
     if (currentInputSelector != InputSelector.NONE) {
@@ -170,7 +175,7 @@ fun UserInput(
                     textFieldFocusState = focused
                 },
                 onMessageSent = {
-                    onMessageSent(textState.text)
+                    onMessageSent(textState.text, contentDescriptor, signed, encrypted, recipientSet)
                     // Reset text field and close keyboard
                     textState = TextFieldValue()
                     // Move scroll to bottom
@@ -190,7 +195,7 @@ fun UserInput(
                 },
                 sendMessageEnabled = textState.text.isNotBlank(),
                 onMessageSent = {
-                    onMessageSent(textState.text)
+                    onMessageSent(textState.text, contentDescriptor, signed, encrypted, recipientSet)
                     // Reset text field and close keyboard
                     textState = TextFieldValue()
                     // Move scroll to bottom
@@ -244,15 +249,29 @@ private fun SelectorExpanded(
         when (currentSelector) {
             InputSelector.EMOJI -> EmojiSelector(onTextAdded, focusRequester)
             InputSelector.DM -> NotAvailablePopup(onCloseRequested)
-            InputSelector.FILE -> FunctionalityNotAvailablePanel()
-            // InputSelector.MAP -> FunctionalityNotAvailablePanel()
+            InputSelector.FILE -> AttachmentHandler()
             InputSelector.PHONE -> FunctionalityNotAvailablePanel()
-            InputSelector.ENCRYPTED -> {}
+            InputSelector.ENCRYPTED -> EncryptionHandler()
+            InputSelector.SIGNED -> SignatureHandler()
             else -> {
                 throw NotImplementedError()
             }
         }
     }
+}
+
+private fun AttachmentHandler() {
+    //todo
+
+}
+
+private fun EncryptionHandler() {
+
+
+}
+
+private fun SignatureHandler() {
+
 }
 
 @Composable
@@ -315,10 +334,9 @@ private fun UserInputSelector(
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.FILE) },
-            // warum gibts kein paperclip icon??
-            icon = Icons.Outlined.Search,
+            icon = Icons.Sharp.AttachFile,
             selected = currentInputSelector == InputSelector.FILE,
-            description = stringResource(id = R.string.attach_photo_desc)
+            description = stringResource(id = R.string.attach_file_desc)
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.ENCRYPTED) },
@@ -332,19 +350,6 @@ private fun UserInputSelector(
             selected = signed,
             description = "Toggle Signature",
         )
-
-//        InputSelectorButton(
-//            onClick = { onSelectorChange(InputSelector.MAP) },
-//            icon = Icons.Outlined.Place,
-//            selected = currentInputSelector == InputSelector.MAP,
-//            description = stringResource(id = R.string.map_selector_desc)
-//        )
-//        InputSelectorButton(
-//            onClick = { onSelectorChange(InputSelector.PHONE) },
-//            icon = Icons.Outlined.Duo,
-//            selected = currentInputSelector == InputSelector.PHONE,
-//            description = stringResource(id = R.string.videochat_desc)
-//        )
 
         val border = if (!sendMessageEnabled) {
             BorderStroke(
@@ -486,10 +491,12 @@ private fun UserInputText(
                         keyboardType,
                         focusState,
                         onMessageSent,
-                        Modifier.fillMaxWidth().semantics {
-                            contentDescription = a11ylabel
-                            keyboardShownProperty = keyboardShown
-                        }
+                        Modifier
+                            .fillMaxWidth()
+                            .semantics {
+                                contentDescription = a11ylabel
+                                keyboardShownProperty = keyboardShown
+                            }
                     )
                 }
             }
@@ -539,7 +546,7 @@ private fun BoxScope.UserInputTextField(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 32.dp),
-            text = stringResource(R.string.textfield_hint),
+            text = "Type message",
             style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor)
         )
     }
@@ -615,56 +622,6 @@ fun ExtendedSelectorInnerButton(
         )
     }
 }
-
-@Composable
-fun ConversationScreen(
-    messengerComponent : SharkNetMessengerComponentImpl,
-    contentType: String,
-    uri: CharSequence,
-    encrypted: Boolean = false,
-    signed: Boolean = true,
-    recipientSet: MutableSet<CharSequence>? = null,
-    recipient: CharSequence? = null
-) {
-    UserInput(
-        onMessageSent = { messageText ->
-            when {
-                !recipientSet.isNullOrEmpty() -> {
-                    messengerComponent.sendSharkMessage(
-                        "sn/$contentType",
-                        messageText.toByteArray(),
-                        "sn://$uri",
-                        recipientSet,
-                        signed,
-                        encrypted,
-                    )
-                }
-
-                recipient != null -> {
-                    messengerComponent.sendSharkMessage(
-                        "sn/$contentType",
-                        messageText.toByteArray(),
-                        "sn://$uri",
-                        recipient,
-                        signed,
-                        encrypted
-                    )
-                }
-
-                else -> {
-                    messengerComponent.sendSharkMessage(
-                        "sn/$contentType",
-                        messageText.toByteArray(),
-                        "sn://$uri",
-                        signed
-                    )
-                }
-            }
-        }
-    )
-}
-
-//todo: add the send file functionality on button click.
 
 @Composable
 fun EmojiTable(
