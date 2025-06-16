@@ -155,6 +155,11 @@ fun UserInput(
     var showError by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+            ) { uri: Uri? ->
+                selectedFileUri = uri
+            }
 
     // Intercept back navigation if there's a InputSelector visible
     if (currentInputSelector != InputSelector.NONE) {
@@ -227,6 +232,9 @@ fun UserInput(
                 encrypted = encrypted,
                 signed = signed,
                 modifier = Modifier,
+                onFileSelect = { filePickerLauncher.launch("*/*") },
+                selectedFileUri = selectedFileUri,
+                onClearFile = { selectedFileUri = null }
             )
             if (showError)
                 Toast.makeText(
@@ -339,6 +347,9 @@ private fun UserInputSelector(
     currentInputSelector: InputSelector,
     encrypted: Boolean = false,
     signed: Boolean = true,
+    onFileSelect: () -> Unit,
+    selectedFileUri: Uri?,
+    onClearFile: () -> Unit
 ) {
     var pki = SharkNetApp.Companion.singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl
     var persons = pki.getPersons()
@@ -346,12 +357,7 @@ private fun UserInputSelector(
     var recipientSet = mutableSetOf<CharSequence>()
     var contentDescriptor = ContentDescriptors.CHAR
     val context = LocalContext.current
-    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) {uri: Uri? ->
-        selectedFileUri = uri
-    }
+
         Row(
         modifier = modifier
             .height(72.dp)
@@ -366,12 +372,19 @@ private fun UserInputSelector(
             description = stringResource(id = R.string.emoji_selector_bt_desc)
         )
         InputSelectorButton(
-            onClick = { contentDescriptor = ContentDescriptors.FILE
-                      filePickerLauncher.launch("*/*") },
+            onClick = { onFileSelect() },
             icon = Icons.Sharp.AttachFile,
             selected = false,
             description = stringResource(id = R.string.attach_file_desc)
         )
+            //cancel selection, cant test bc there are no files
+            selectedFileUri?.let {
+                Button(
+                    onClick = { onClearFile() }) {
+                    Text("Cancel")
+                }
+            }
+
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.ENCRYPTED) },
             icon = if (encrypted) Icons.Filled.Lock else Icons.Outlined.LockOpen, // use filled icon if encrypted == true
