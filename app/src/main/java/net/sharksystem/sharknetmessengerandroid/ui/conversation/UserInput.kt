@@ -358,7 +358,7 @@ private fun UserInputSelector(
     var contentDescriptor = ContentDescriptors.CHAR
     val context = LocalContext.current
 
-        Row(
+    Row(
         modifier = modifier
             .height(72.dp)
             .wrapContentHeight()
@@ -366,10 +366,23 @@ private fun UserInputSelector(
         verticalAlignment = Alignment.CenterVertically
     ) {
         InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.EMOJI) },
-            icon = Icons.Outlined.Face,
-            selected = currentInputSelector == InputSelector.EMOJI,
-            description = stringResource(id = R.string.emoji_selector_bt_desc)
+            onClick = { onSelectorChange(InputSelector.SIGNED) },
+            icon = if (signed) Icons.TwoTone.VerifiedUser else Icons.TwoTone.VerifiedUser,
+            selected = signed,
+            description = "Toggle Signature",
+        )
+        InputSelectorButton(
+            onClick = { onSelectorChange(InputSelector.ENCRYPTED) },
+            icon = if (encrypted) Icons.Filled.Lock else Icons.Outlined.LockOpen, // use filled icon if encrypted == true
+            selected = encrypted,
+            description = "Toggle Encryption",
+        )
+
+        InputSelectorButton(
+            onClick = { showRecipientDialog = true },
+            icon = Icons.TwoTone.People,
+            selected = false,
+            description = "Select Recipients",
         )
         InputSelectorButton(
             onClick = { onFileSelect() },
@@ -377,32 +390,22 @@ private fun UserInputSelector(
             selected = false,
             description = stringResource(id = R.string.attach_file_desc)
         )
-            //cancel selection, cant test bc there are no files
-            selectedFileUri?.let {
-                Button(
-                    onClick = { onClearFile() }) {
-                    Text("Cancel")
-                }
+        //cancel selection, cant test bc there are no files
+        selectedFileUri?.let {
+            Button(
+                onClick = { onClearFile() }) {
+                Text("Cancel")
             }
+        }
 
         InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.ENCRYPTED) },
-            icon = if (encrypted) Icons.Filled.Lock else Icons.Outlined.LockOpen, // use filled icon if encrypted == true
-            selected = encrypted,
-            description = "Toggle Encryption",
+            onClick = { onSelectorChange(InputSelector.EMOJI) },
+            icon = Icons.Outlined.Face,
+            selected = currentInputSelector == InputSelector.EMOJI,
+            description = stringResource(id = R.string.emoji_selector_bt_desc)
         )
-        InputSelectorButton(
-            onClick = { onSelectorChange(InputSelector.SIGNED) },
-            icon = if (signed) Icons.TwoTone.VerifiedUser else Icons.TwoTone.VerifiedUser,
-            selected = signed,
-            description = "Toggle Signature",
-        )
-        InputSelectorButton(
-            onClick = { showRecipientDialog = true },
-            icon = Icons.TwoTone.People,
-            selected = false,
-            description = "Select Recipients",
-        )
+
+
         if (showRecipientDialog) {
             RecipientSelectionScreen(
                 knownPeers = persons,
