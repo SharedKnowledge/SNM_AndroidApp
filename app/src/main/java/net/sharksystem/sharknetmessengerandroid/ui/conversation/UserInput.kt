@@ -106,6 +106,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.R
 
@@ -247,12 +248,11 @@ private fun SelectorExpanded(
 
     Surface(tonalElevation = 8.dp) {
         when (currentSelector) {
+            InputSelector.SIGNED,
+            InputSelector.FILE -> AttachmentSelector()
+            InputSelector.ENCRYPTED,
             InputSelector.EMOJI -> EmojiSelector(onTextAdded, focusRequester)
-            InputSelector.DM -> NotAvailablePopup(onCloseRequested)
-            InputSelector.FILE -> AttachmentHandler()
-            InputSelector.PHONE -> FunctionalityNotAvailablePanel()
-            InputSelector.ENCRYPTED -> EncryptionHandler()
-            InputSelector.SIGNED -> SignatureHandler()
+
             else -> {
                 throw NotImplementedError()
             }
@@ -260,17 +260,15 @@ private fun SelectorExpanded(
     }
 }
 
-private fun AttachmentHandler() {
-    //todo
-
+@Composable
+private fun AttachmentSelector() {
+    FunctionalityNotAvailablePanel()
 }
 
-private fun EncryptionHandler() {
-
-
-}
-
-private fun SignatureHandler() {
+private fun SignatureHandler(
+    signed: Boolean,
+    onSignatureToggled: (Boolean) -> Unit,
+) {
 
 }
 

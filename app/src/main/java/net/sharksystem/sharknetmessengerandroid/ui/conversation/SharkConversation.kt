@@ -95,6 +95,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import net.sharksystem.SharkPeer
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
@@ -497,6 +498,8 @@ fun SNClickableMessage(
     authorClicked: (String) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
+    val currentUserId = SharkNetApp.getPeerID()
+    val authorized =
 
     val styledMessage = messageFormatter(
         text = String(message.content, Charsets.UTF_8),
