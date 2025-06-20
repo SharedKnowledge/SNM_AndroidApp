@@ -113,9 +113,9 @@ class ProfileFragment : Fragment() {
 
                 SharkNetMessengerAndroidTheme {
                     if (userData == null) {
-                        ProfileError()
+                        SharkProfileError()
                     } else {
-                        ProfileScreen(
+                        SharkProfileScreen(
                             userData = userData!!,
                             nestedScrollInteropConnection = nestedScrollInteropConnection
                         )

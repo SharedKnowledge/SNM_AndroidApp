@@ -94,7 +94,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.sharknetmessengerandroid.R
@@ -112,6 +111,7 @@ import java.time.format.DateTimeFormatter
  * @param modifier [Modifier] to apply to this layout node
  * @param onNavIconPressed Sends an event up when the user clicks on the menu
  */
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SharkConversationContent(
@@ -379,7 +379,6 @@ fun SNMessage(
             // Avatar
             Image(
                 painter = painterResource(id = R.drawable.placeholder_avatar),
-                //@todo try from shark data
                 contentDescription = null,
                 modifier = Modifier
                     .size(42.dp)
