@@ -17,7 +17,7 @@ import net.sharksystem.asap.android.apps.ASAPAndroidPeer
 import net.sharksystem.pki.AndroidSharkPKIComponentFactory
 import net.sharksystem.pki.AndroidSharkPKIComponentImpl
 import net.sharksystem.pki.SharkPKIComponent
-
+import net.sharksystem.asap.ASAPSecurityException
 
 /**
  * The main application class for SharkNet, responsible for initializing
@@ -49,7 +49,7 @@ class SharkNetApp {
          */
         fun initialize(context: Context, peerName: String) {
             if (peerName == "") throw IllegalArgumentException("peerName must not be empty")
-            Log.d("SharkDebug", "SharkNet App initiliaze called $peerName")
+            Log.d("SharkDebug", "SharkNet App initialize called $peerName")
             if (singleton == null) {
                 singleton = SharkNetApp(context, peerName)
                 Log.d("SharkDebug", "SharkNet App created called $peerName")
@@ -61,10 +61,10 @@ class SharkNetApp {
                 PREFERENCES_FILE, Context.MODE_PRIVATE
             )
             val existingPeerName = sharedPref.getString(PF_PEER_NAME, null)
-            Log.d("SharkDebug", "SharkNet App load called sharedpreferences - $existingPeerName")
+            Log.d("SharkDebug", "SharkNet App load called shared preferences - $existingPeerName")
             if (existingPeerName != null ) {
                 singleton = SharkNetApp(context, existingPeerName)
-                Log.d("SharkDebug", "SharkNet App created called sharedpreferences - $existingPeerName")
+                Log.d("SharkDebug", "SharkNet App created called shared preferences - $existingPeerName")
                 return true
             } else {
                 return false
@@ -78,19 +78,24 @@ class SharkNetApp {
 
         fun getPeerName(peerID: CharSequence) : String {
             if (peerID == singleton!!.peerID) return singleton!!.getPeer().sharkPeerName.toString()
-            //@todo check why persons is 0 if there is no other persons (self not listed)
-            val sharkPKI = singleton!!.getPeer().getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl
+            val sharkPKI = singleton!!.getPeer()
+                .getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl
+            //throws ASAPSecurityException, if Peer not found
             return sharkPKI.getPersonValuesByID(peerID).name.toString()
         }
 
         fun getPeerNameWithID(peerID: CharSequence) : String {
-            return "${getPeerName(peerID)}_${peerID}"
+            return try {
+                "${getPeerName(peerID)}_${peerID}"
+            } catch (_: ASAPSecurityException) {
+                "$peerID"
+            }
         }
 
         fun dummymethod() {
             //val pki =  singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
             //Log.d("SharkDebug",pki?.numberOfPersons.toString())
-            getMessengerComponent()!!.createChannel("sn://snm_android_test3","sn://snm_android_test3")
+            getMessengerComponent()!!.createChannel("sn://snm_20_06_1","sn://snm_android_test3")
         }
 
     }
@@ -121,13 +126,9 @@ class SharkNetApp {
         }
         // produce folder
         val rootDir = Util.getASAPRootDirectory(context, APP_FOLDER_NAME, this.peerName)
-        //@todo filetransfer connection to that
         // produce application side shark peer
         this.sharkPeer = SharkPeerFS(this.peerName, rootDir.absolutePath)
-        ///////////////////////////// SETUP PKI /////////////////////////////
-        // create Android specific key store
-        // @todo AndroidASAPKeyStore (like SharkNet2Android) net.sharksystem.sharknet.AndroidASAPKeyStore
-        /**//////////////////////// setup PKI ///////////////////////////////////////////// */
+        //////////////////////// SETUP PKI /////////////////////////////////////////////
         // create Android specific key store
         val androidASAPKeyStore = AndroidASAPKeyStoreNew(context,this.peerID)
         // create PKI Component Factory and add as Component
@@ -140,7 +141,7 @@ class SharkNetApp {
         val sharkPKI = this.sharkPeer.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
         sharkPKI?.setASAPKeyStore(androidASAPKeyStore)
 
-
+        //////////////////////// SETUP MESSENGER /////////////////////////////////////////////
         // create Messenger Component Factory and add as Component
         // create messenger factory - needs a pki
         // get messenger factory with pki component as parameter.
@@ -153,6 +154,8 @@ class SharkNetApp {
         this.sharkPeer.addComponent(
             messengerFactory, SharkNetMessengerComponent::class.java
         )
+        //////////////////////// INIT ANDROID PEER /////////////////////////////////////////////
+
         // initialize Peer
         // setup android (application side peer)
         ASAPAndroidPeer.initializePeer(
