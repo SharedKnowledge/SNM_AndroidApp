@@ -23,12 +23,15 @@
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
+import android.R.attr.onClick
 import android.content.ClipDescription
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,6 +76,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -114,6 +118,7 @@ import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroi
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.compareTo
 
 /**
  * Entry point for a conversation screen.
@@ -207,7 +212,9 @@ fun SharkConversationContent(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
-            Modifier.fillMaxSize().padding(paddingValues)
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
                 .background(color = background)
                 .border(width = 2.dp, color = borderStroke)
                 .dragAndDropTarget(shouldStartDragAndDrop = { event ->
@@ -237,7 +244,9 @@ fun SharkConversationContent(
                 },
                 // let this element handle the padding so that the elevation is shown behind the
                 // navigation bar
-                modifier = Modifier.navigationBarsPadding().imePadding()
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding()
             )
         }
     }
@@ -384,15 +393,15 @@ fun SNMessage(
 
     val spaceBetweenAuthors = Modifier.padding(top = 8.dp)
     Row(modifier = spaceBetweenAuthors) {
-            // Avatar
-            Image(
-                painter = painterResource(id = R.drawable.placeholder_avatar),
-                //@todo try from shark data
-                contentDescription = null,
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-            )
+        // Avatar
+        Image(
+            painter = painterResource(id = R.drawable.placeholder_avatar),
+            //@todo try from shark data
+            contentDescription = null,
+            modifier = Modifier
+                .size(42.dp)
+                .clip(CircleShape)
+        )
         SNAuthorAndTextMessage(
             msg = msg,
             isUserMe = isUserMe,
@@ -475,7 +484,6 @@ fun SNChatItemBubble(
     isUserMe: Boolean,
     authorClicked: (String) -> Unit
 ) {
-    // State für das Anzeigen des Detail-Modals
     var showMessageDetails by remember { mutableStateOf(false) }
 
     val backgroundBubbleColor = if (isUserMe) {
@@ -484,7 +492,6 @@ fun SNChatItemBubble(
         MaterialTheme.colorScheme.surfaceVariant
     }
 
-    // Wenn showMessageDetails true ist, zeige das Modal an
     if (showMessageDetails) {
         MessageDetailModal(
             message = message,
@@ -492,12 +499,21 @@ fun SNChatItemBubble(
         )
     }
 
+    val longPressModifier = Modifier.combinedClickable(
+        onClick = {
+//            Log.d("SharkDebug", "Short press detected")
+        },
+        onLongClick = {
+            showMessageDetails = true
+//            Log.d("SharkDebug", "Long press detected")
+        }
+    )
+
     Column {
         Surface(
             color = backgroundBubbleColor,
             shape = ChatBubbleShape,
-            // Mache die gesamte Surface klickbar
-            modifier = Modifier.clickable { showMessageDetails = true }
+            modifier = longPressModifier
         ) {
             SNClickableMessage(
                 message = message,
