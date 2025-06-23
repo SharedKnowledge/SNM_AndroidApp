@@ -110,6 +110,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import net.sharksystem.app.messenger.SharkNetMessage
+import net.sharksystem.app.messenger.SharkNetMessengerChannel
+import net.sharksystem.app.messenger.SharkNetMessengerChannelImpl
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.ui.components.AppBar
 import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
@@ -261,9 +263,14 @@ fun SharkChannelNameBar(
     onNavIconPressed: () -> Unit = { }
 ) {
     var functionalityNotAvailablePopupShown by remember { mutableStateOf(false) }
+    var showChannelDetails by remember { mutableStateOf(false) }
+
     if (functionalityNotAvailablePopupShown) {
         FunctionalityNotAvailablePopup { functionalityNotAvailablePopupShown = false }
     }
+//    if (showChannelDetails) {
+//        ChannelDetailsModal { showChannelDetails = false }
+//    }
     AppBar(
         modifier = modifier,
         scrollBehavior = scrollBehavior,
@@ -530,6 +537,8 @@ fun SNClickableMessage(
     isUserMe: Boolean,
     authorClicked: (String) -> Unit
 ) {
+    var showMessageDetails by remember { mutableStateOf(false) }
+
     val uriHandler = LocalUriHandler.current
 
     val styledMessage = messageFormatter(
@@ -537,21 +546,41 @@ fun SNClickableMessage(
         primary = isUserMe
     )
 
+    if (showMessageDetails) {
+        MessageDetailModal(
+            message = message,
+            onDismiss = { showMessageDetails = false }
+        )
+    }
+
+//    Text(
+//        text = styledMessage,
+//        style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
+//        modifier = Modifier.padding(16.dp)
+//            .combinedClickable(
+//                onClick = { styledMessage.getStringAnnotations(start = ) },
+//                onLongClick = { }
+//            )
+//    )
+
     ClickableText(
         text = styledMessage,
         style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
         modifier = Modifier.padding(16.dp),
         onClick = {
-            styledMessage
-                .getStringAnnotations(start = it, end = it)
-                .firstOrNull()
-                ?.let { annotation ->
-                    when (annotation.tag) {
-                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
-                        else -> Unit
+                val stringAnnotation = styledMessage
+                    .getStringAnnotations(start = it, end = it)
+                    .firstOrNull()
+                if (stringAnnotation != null) {
+                    stringAnnotation.let { annotation ->
+                        when (annotation.tag) {
+                            SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                            SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
+                            else -> Unit
+                        }
                     }
                 }
+                else { showMessageDetails = true }
         }
     )
 }
@@ -679,6 +708,103 @@ fun MessageDetailModal(
         }
     }
 }
+
+///**
+// * Zeigt detaillierte Informationen über den Kanal in einem Bottom Sheet Modal an
+// */
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun ChannelDetailsModal(
+//    channel: SharkNetMessengerChannelImpl,
+//    onDismiss: () -> Unit
+//) {
+//    val modalBottomSheetState = rememberModalBottomSheetState()
+//    val scrollState = rememberScrollState()
+//
+//    ModalBottomSheet(
+//        onDismissRequest = onDismiss,
+//        sheetState = modalBottomSheetState
+//    ) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//                .verticalScroll(scrollState)
+//        ) {
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text(
+//                    text = "Nachrichtendetails",
+//                    style = MaterialTheme.typography.titleLarge,
+//                    modifier = Modifier.weight(1f)
+//                )
+//
+//                IconButton(onClick = onDismiss) {
+//                    Icon(
+//                        imageVector = Icons.Outlined.Close,
+//                        contentDescription = "Schließen"
+//                    )
+//                }
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            MessageDetailCard(
+//                title = "Nachrichteninhalt",
+//                content = String(message.content, Charsets.UTF_8)
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            // Zeit formatieren
+//            val instant = Instant.ofEpochMilli(message.creationTime)
+//            val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+//                .withZone(ZoneId.systemDefault())
+//            val formattedTime = formatter.format(instant)
+//
+//            MessageDetailCard(
+//                title = "Zeitstempel",
+//                content = formattedTime
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            MessageDetailCard(
+//                title = "Absender",
+//                content = message.sender.toString()
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            MessageDetailCard(
+//                title = "Empfänger",
+//                content = message.recipients.toString()
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            MessageDetailCard(
+//                title = "Content Type",
+//                content = message.contentType.toString()
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            MessageDetailCard(
+//                title = "Sicherheitsinfo",
+//                content = "Verifiziert: ${message.verified()}\n" +
+//                        "Signiert: ${message.signed()}\n" +
+//                        "Verschlüsselt: ${message.encrypted()}\n" +
+//                        "Konnte entschlüsselt werden: ${message.couldBeDecrypted()}"
+//            )
+//
+//            // Extra Platz am Ende hinzufügen
+//            Spacer(modifier = Modifier.height(32.dp))
+//        }
+//    }
+//}
 
 /**
  * Hilfsfunktion zum Anzeigen von Details in einem Kartenformat
