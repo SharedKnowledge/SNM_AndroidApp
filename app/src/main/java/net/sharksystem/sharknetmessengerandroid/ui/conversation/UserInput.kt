@@ -81,6 +81,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -124,9 +125,9 @@ enum class InputSelector {
     ENCRYPTED,
     SIGNED,
 }
-enum class ContentDescriptors {
-    FILE,
-    CHAR
+enum class ContentDescriptors(string: String) {
+    FILE("sn/file"),
+    CHAR("sn/character")
 }
 
 enum class EmojiStickerSelector {
@@ -151,7 +152,6 @@ fun UserInput(
     var encrypted by rememberSaveable { mutableStateOf(false) }
     var signed by rememberSaveable { mutableStateOf(true) }
     var recipientSet = mutableSetOf<CharSequence>()
-    var contentDescriptor = rememberSaveable { ContentDescriptors.CHAR }
     var showError by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
@@ -160,6 +160,11 @@ fun UserInput(
             ) { uri: Uri? ->
                 selectedFileUri = uri
             }
+    var contentDescriptor by rememberSaveable { mutableStateOf(ContentDescriptors.CHAR) }
+
+    LaunchedEffect(selectedFileUri) {
+        contentDescriptor = if (selectedFileUri != null) ContentDescriptors.FILE else ContentDescriptors.CHAR
+    }
 
     // Intercept back navigation if there's a InputSelector visible
     if (currentInputSelector != InputSelector.NONE) {
@@ -391,6 +396,7 @@ private fun UserInputSelector(
             description = stringResource(id = R.string.attach_file_desc)
         )
         //cancel selection, cant test bc there are no files
+        // removed due issues with button placement
         selectedFileUri?.let {
             Button(
                 onClick = { onClearFile() }) {
