@@ -23,15 +23,16 @@ package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.runtime.toMutableStateList
 import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
-import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
-import java.io.FileInputStream
-import java.io.InputStream
+import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms
+import net.sharksystem.sharknetmessengerandroid.sharknet.AndroidASAPKeyStoreNew
+import net.sharksystem.asap.utils.ASAPSerialization
 
 class SharkConversationUiState(
     val channelUri: String,
@@ -63,9 +64,31 @@ class SharkConversationUiState(
         val fileContent: ByteArray? = selectedFileUri?.let { uri ->
             context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
         }
+
+        val contentToSend: ByteArray = fileContent ?: msg.toByteArray()
+        var finalContent: ByteArray = contentToSend
+
+        if (encrypted && !selectedRecipients.isNullOrEmpty()) {
+                if (msgType == ContentDescriptors.CHAR.toString()) {
+                    try{
+                    val keyStore = AndroidASAPKeyStoreNew(
+                    context,
+                    SharkNetApp.singleton?.getPeer()?.peerID.toString()
+                )
+                ASAPCryptoAlgorithms.produceEncryptedMessagePackage(
+                    contentToSend,
+                    selectedRecipients as CharSequence?,
+                    keyStore
+                ) ?: throw Exception("encryption failed")
+            } catch (e: Exception) {
+                Toast.makeText(context, "Encryption failed: ${e.message}", Toast.LENGTH_LONG).show()
+                        return
+                }
+            }
+        }
         messengerComponentImpl?.sendSharkMessage(
             msgType,
-            fileContent ?: msg.toByteArray(),
+            finalContent,
             this.channelUri,
             selectedRecipients,
             signed,

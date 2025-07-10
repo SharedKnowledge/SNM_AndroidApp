@@ -573,8 +573,13 @@ fun SNClickableMessage(
         )
     }
     else {
-        val encryptedMessageCharacters = listOf('@', '#', '$', '%', '!', '?', '*', '!', '@', '#', '$', '%')
-        val censored = message.content.decodeToString().map { encryptedMessageCharacters.random() }.joinToString()
+        val encryptedMessageCharacters = listOf('@', '#', '$', '%', '!', '?', '*', '%')
+        val censoredLength = message.content.size.coerceAtMost(30)
+        val censored = buildString {
+            repeat(censoredLength) {
+                append(encryptedMessageCharacters.random())
+            }
+        }
         Text(
             text = censored,
             style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
