@@ -26,7 +26,7 @@ import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.app.messenger.SharkNetMessengerComponent
 import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
-import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkDataHelper
 
 class SharkConversationUiState(
     val channelUri: String,

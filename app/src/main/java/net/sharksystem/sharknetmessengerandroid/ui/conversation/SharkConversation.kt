@@ -100,7 +100,7 @@ import net.sharksystem.app.messenger.SharkNetMessage
 import net.sharksystem.sharknetmessengerandroid.R
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import net.sharksystem.sharknetmessengerandroid.ui.components.AppBar
-import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
+import net.sharksystem.sharknetmessengerandroid.sharknet.SharkDataHelper
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 import java.time.format.DateTimeFormatter
 

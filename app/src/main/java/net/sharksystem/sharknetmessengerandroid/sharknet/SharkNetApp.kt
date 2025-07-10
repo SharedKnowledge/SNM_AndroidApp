@@ -95,7 +95,9 @@ class SharkNetApp {
         fun dummymethod() {
             //val pki =  singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
             //Log.d("SharkDebug",pki?.numberOfPersons.toString())
-            getMessengerComponent()!!.createChannel("sn://snm_20_06_1","sn://snm_android_test3")
+            //getMessengerComponent()!!.createChannel("sn://snm_20_06_1","sn://snm_android_test3")
+            val sharkPKI = SharkNetApp.singleton?.sharkPeer?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
+            sharkPKI?.createNewKeyPair()
         }
 
     }
@@ -184,6 +186,7 @@ class SharkNetApp {
     fun getPeer() : SharkPeer {
         return this.sharkPeer
     }
+
     private fun setApplicationSideASAPAndroidPeer(asapAndroidPeer: ASAPAndroidPeer?) {
         this.asapAndroidPeer = asapAndroidPeer
     }
