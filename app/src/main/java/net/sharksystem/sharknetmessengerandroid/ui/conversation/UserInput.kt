@@ -308,13 +308,6 @@ private fun AttachmentSelector() {
     FunctionalityNotAvailablePanel()
 }
 
-private fun SignatureHandler(
-    signed: Boolean,
-    onSignatureToggled: (Boolean) -> Unit,
-) {
-
-}
-
 @Composable
 fun FunctionalityNotAvailablePanel() {
     AnimatedVisibility(
