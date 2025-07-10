@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.edit
 import net.sharksystem.SharkPeer
 import net.sharksystem.SharkPeerFS
@@ -17,6 +18,7 @@ import net.sharksystem.asap.android.apps.ASAPAndroidPeer
 import net.sharksystem.pki.AndroidSharkPKIComponentFactory
 import net.sharksystem.pki.AndroidSharkPKIComponentImpl
 import net.sharksystem.pki.SharkPKIComponent
+import java.security.PrivateKey
 
 
 /**
@@ -91,6 +93,9 @@ class SharkNetApp {
             //val pki =  singleton?.getPeer()?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
             //Log.d("SharkDebug",pki?.numberOfPersons.toString())
             getMessengerComponent()!!.createChannel("sn://snm_android_test3","sn://snm_android_test3")
+            val sharkPKI = SharkNetApp.singleton?.sharkPeer?.getComponent(SharkPKIComponent::class.java) as AndroidSharkPKIComponentImpl?
+            sharkPKI?.createNewKeyPair()
+           var  pKey = sharkPKI?.privateKey
         }
 
     }

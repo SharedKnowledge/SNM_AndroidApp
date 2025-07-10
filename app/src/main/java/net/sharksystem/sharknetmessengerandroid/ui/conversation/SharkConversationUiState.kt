@@ -33,7 +33,11 @@ import net.sharksystem.sharknetmessengerandroid.ui.data.SharkDataHelper
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms
 import net.sharksystem.sharknetmessengerandroid.sharknet.AndroidASAPKeyStoreNew
 import net.sharksystem.asap.utils.ASAPSerialization
+import java.security.KeyPair
 
+/**
+ * Represents the UI state of a SharkNet conversation.
+ */
 class SharkConversationUiState(
     val channelUri: String,
     initialMessages: List<SharkNetMessage>
@@ -46,6 +50,9 @@ class SharkConversationUiState(
     private val _messages: MutableList<SharkNetMessage> = initialMessages.toMutableStateList()
     val messages: List<SharkNetMessage> = _messages
 
+    /**
+     * Adds a message to the conversation.
+     */
     fun addMessage(
         context: Context,
         msg: String,
@@ -86,6 +93,22 @@ class SharkConversationUiState(
                 }
             }
         }
+        //key pair must be generated before signing
+//        if (signed) {
+//            try {
+//                val keyStore = AndroidASAPKeyStoreNew(
+//                    context,
+//                    SharkNetApp.singleton?.getPeer()?.peerID.toString()
+//                )
+//                finalContent = ASAPCryptoAlgorithms.sign(
+//                    contentToSend,
+//                    keyStore
+//                ) ?: throw Exception("Signing failed")
+//            } catch (e: Exception) {
+//                Toast.makeText(context, "${e.message}", Toast.LENGTH_LONG).show()
+//                return
+//            }
+//        }
         messengerComponentImpl?.sendSharkMessage(
             msgType,
             finalContent,

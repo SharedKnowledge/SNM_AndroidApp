@@ -23,7 +23,7 @@ fun RecipientSelectionScreen(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select Recipients for Encryption") },
+        title = { Text("Select Recipients") },
         text = {
             LazyColumn {
                 items(knownPeers.toList()) { peer ->

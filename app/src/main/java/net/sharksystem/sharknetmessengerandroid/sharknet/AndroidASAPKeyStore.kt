@@ -14,6 +14,8 @@ import java.security.KeyStore
 import java.security.KeyStoreException
 import java.util.Calendar
 import androidx.core.content.edit
+import java.security.PrivateKey
+import java.security.PublicKey
 
 // TODO: Refactor this class to use background coroutineS for key generation and loading, as well as DataStore access
 class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
@@ -38,6 +40,9 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
 
         // Gilt das selbe wie für den context? (Siehe Kommentar weiter unten)
         var keyStore: KeyStore? = null
+
+        var privateKey: PrivateKey? = null
+        var publicKey: PublicKey? = null
 
         /*
         * A static field will leak contexts.
@@ -191,11 +196,21 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
     override fun getOwner(): CharSequence? {
         TODO("Not yet implemented")
     }
+    */
 
     override fun getPrivateKey(): PrivateKey? {
-        TODO("Not yet implemented")
+        try {
+            val keyStore = getKeyStore()
+            val privateKeyEntry = keyStore.getEntry(KEYSTORE_OWNER_ALIAS, null) as? KeyStore.PrivateKeyEntry
+            Log.e("SharkDebug","Private Key loaded")
+            return privateKeyEntry?.privateKey
+        } catch (e: Exception) {
+            Log.e(getLogStart(), "Error retrieving private key: ${e.message}")
+            return null
+        }
     }
 
+    /*
     override fun getPublicKey(): PublicKey? {
         TODO("Not yet implemented")
     }
