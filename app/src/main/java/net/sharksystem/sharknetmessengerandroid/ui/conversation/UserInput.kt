@@ -22,7 +22,7 @@
 package net.sharksystem.sharknetmessengerandroid.ui.conversation
 
 import FunctionalityNotAvailablePopup
-import RecipientSelectionScreen
+import RecipientSelectionDialogue
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -413,7 +413,7 @@ private fun UserInputSelector(
 
 
         if (showRecipientDialog) {
-            RecipientSelectionScreen(
+            RecipientSelectionDialogue(
                 knownPeers = persons,
                 onSelectionConfirmed = { selectedPeers ->
                     recipientSet = selectedPeers

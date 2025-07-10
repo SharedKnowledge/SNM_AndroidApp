@@ -6,14 +6,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.sharksystem.SharkPeer
 import net.sharksystem.asap.persons.PersonValues
-import net.sharksystem.asap.persons.PersonValuesImpl
 import net.sharksystem.pki.AndroidSharkPKIComponentImpl
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 
 @Composable
-fun RecipientSelectionScreen(
+fun RecipientSelectionDialogue(
     knownPeers: Set<PersonValues> =
         AndroidSharkPKIComponentImpl(SharkNetApp.singleton!!.getPeer()).getPersons(),
     onSelectionConfirmed: (MutableSet<CharSequence>) -> Unit,
