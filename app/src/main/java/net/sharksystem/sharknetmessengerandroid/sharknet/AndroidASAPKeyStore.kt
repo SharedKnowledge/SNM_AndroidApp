@@ -94,8 +94,9 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
         // Load the key pair from Android KeyStore
         try {
             val keyStore = getKeyStore()
-            val privateKeyEntry = keyStore.getEntry(Companion.KEYSTORE_OWNER_ALIAS, null) as? KeyStore.PrivateKeyEntry
-                ?: throw ASAPSecurityException("no keys stored")
+            val privateKeyEntry =
+                keyStore.getEntry(Companion.KEYSTORE_OWNER_ALIAS, null) as? KeyStore.PrivateKeyEntry
+                    ?: throw ASAPSecurityException("no keys stored")
 
             // Extract keys from entry
             val keyPair = KeyPair(
@@ -113,7 +114,8 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
         // Load key creation timestamp from SharedPreferences
         if (Companion.creationTime == DateTimeHelper.TIME_NOT_SET) {
             val sharedPrefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            Companion.creationTime = sharedPrefs.getLong(KEY_KEYPAIR_CREATION_TIME, DateTimeHelper.TIME_NOT_SET)
+            Companion.creationTime =
+                sharedPrefs.getLong(KEY_KEYPAIR_CREATION_TIME, DateTimeHelper.TIME_NOT_SET)
         }
     }
 
@@ -125,7 +127,7 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
         Companion.creationTime = time
 
         val sharedPrefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        sharedPrefs.edit{
+        sharedPrefs.edit {
             putLong(KEY_KEYPAIR_CREATION_TIME, time)
         }
     }
@@ -141,8 +143,11 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
                 add(Calendar.YEAR, ASAPCertificate.DEFAULT_CERTIFICATE_VALIDITY_IN_YEARS)
             }
             // Log key validity period
-            Log.d(getLogStart(), "create key pair valid from ${DateTimeHelper.long2DateString(start.timeInMillis)} " +
-                    "to ${DateTimeHelper.long2DateString(end.timeInMillis)}")
+            Log.d(
+                getLogStart(),
+                "create key pair valid from ${DateTimeHelper.long2DateString(start.timeInMillis)} " +
+                        "to ${DateTimeHelper.long2DateString(end.timeInMillis)}"
+            )
 
             // Generate key pair using Android KeyStore
             val keyPairGenerator = KeyPairGenerator.getInstance(
@@ -150,25 +155,26 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
             )
 
             // Configure key properties
-            val keySpec = KeyGenParameterSpec.Builder(Companion.KEYSTORE_OWNER_ALIAS, Companion.ANY_PURPOSE)
-                .setRandomizedEncryptionRequired(false)
-                .setDigests(
-                    KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_MD5,
-                    KeyProperties.DIGEST_SHA1, KeyProperties.DIGEST_SHA224,
-                    KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA384,
-                    KeyProperties.DIGEST_SHA512
-                )
-                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS)
-                .setEncryptionPaddings(
-                    KeyProperties.ENCRYPTION_PADDING_NONE,
-                    KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
-                    KeyProperties.ENCRYPTION_PADDING_RSA_OAEP
-                )
-                .setUserAuthenticationRequired(false)
-                .setKeyValidityStart(start.time)
-                .setKeyValidityEnd(end.time)
-                .setKeySize(Companion.KEY_SIZE)
-                .build()
+            val keySpec =
+                KeyGenParameterSpec.Builder(Companion.KEYSTORE_OWNER_ALIAS, Companion.ANY_PURPOSE)
+                    .setRandomizedEncryptionRequired(false)
+                    .setDigests(
+                        KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_MD5,
+                        KeyProperties.DIGEST_SHA1, KeyProperties.DIGEST_SHA224,
+                        KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA384,
+                        KeyProperties.DIGEST_SHA512
+                    )
+                    .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS)
+                    .setEncryptionPaddings(
+                        KeyProperties.ENCRYPTION_PADDING_NONE,
+                        KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
+                        KeyProperties.ENCRYPTION_PADDING_RSA_OAEP
+                    )
+                    .setUserAuthenticationRequired(false)
+                    .setKeyValidityStart(start.time)
+                    .setKeyValidityEnd(end.time)
+                    .setKeySize(Companion.KEY_SIZE)
+                    .build()
 
             // Generate and store the key pair
             keyPairGenerator.initialize(keySpec)
@@ -202,14 +208,16 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
     override fun getPrivateKey(): PrivateKey? {
         try {
             val keyStore = getKeyStore()
-            val privateKeyEntry = keyStore.getEntry(KEYSTORE_OWNER_ALIAS, null) as? KeyStore.PrivateKeyEntry
-            Log.e("SharkDebug","Private Key loaded")
+            val privateKeyEntry =
+                keyStore.getEntry(KEYSTORE_OWNER_ALIAS, null) as? KeyStore.PrivateKeyEntry
+            Log.e("SharkDebug", "Private Key loaded")
             return privateKeyEntry?.privateKey
         } catch (e: Exception) {
             Log.e(getLogStart(), "Error retrieving private key: ${e.message}")
             return null
         }
     }
+}
 
     /*
     override fun getPublicKey(): PublicKey? {
@@ -241,3 +249,4 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
         return DEFAULT_SYMMETRIC_KEY_SIZE
     }
 }
+*/
