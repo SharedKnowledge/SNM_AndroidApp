@@ -1,10 +1,7 @@
-package net.sharksystem.sharknetmessengerandroid.ui.data
+package net.sharksystem.sharknetmessengerandroid.sharknet
 
 import android.util.Log
 import net.sharksystem.app.messenger.SharkNetMessage
-import net.sharksystem.app.messenger.SharkNetMessengerComponent
-import net.sharksystem.app.messenger.SharkNetMessengerComponentImpl
-import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

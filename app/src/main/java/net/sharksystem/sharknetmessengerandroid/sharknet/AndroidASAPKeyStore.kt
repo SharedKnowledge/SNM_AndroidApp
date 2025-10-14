@@ -14,8 +14,10 @@ import java.security.KeyStore
 import java.security.KeyStoreException
 import java.util.Calendar
 import androidx.core.content.edit
+import net.sharksystem.fs.ExtraData
 import java.security.PrivateKey
 import java.security.PublicKey
+import javax.crypto.SecretKey
 
 // TODO: Refactor this class to use background coroutineS for key generation and loading, as well as DataStore access
 class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
@@ -180,7 +182,7 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
         }
     }
 
-    /*
+
     override fun generateSymmetricKey(): SecretKey? {
         TODO("Not yet implemented")
     }
@@ -196,7 +198,6 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
     override fun getOwner(): CharSequence? {
         TODO("Not yet implemented")
     }
-    */
 
     override fun getPrivateKey(): PrivateKey? {
         try {
@@ -214,7 +215,7 @@ class AndroidASAPKeyStoreNew : InMemoASAPKeyStore {
     override fun getPublicKey(): PublicKey? {
         TODO("Not yet implemented")
     }
-    */
+
 
     override fun getKeysCreationTime(): Long {
         return Companion.creationTime
