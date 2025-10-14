@@ -33,6 +33,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".ui.certificates.CertificatesActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

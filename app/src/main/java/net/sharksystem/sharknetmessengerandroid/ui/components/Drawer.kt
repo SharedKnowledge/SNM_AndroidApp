@@ -23,7 +23,9 @@ package net.sharksystem.sharknetmessengerandroid.ui.components
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
@@ -109,11 +111,10 @@ fun DrawerContent(
         ) {
             onProfileClicked(sharkColleagueProfile.userId)
         }
-//        if (widgetAddingIsSupported(LocalContext.current)) {
-//            DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
-//            DrawerItemHeader("Settings")
-//            WidgetDiscoverability()
-//        }
+        // Add Settings section at the bottom
+        DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
+        DrawerItemHeader("Settings")
+        SettingsItem()
     }
 }
 
@@ -262,6 +263,38 @@ fun DrawerPreviewDark() {
                 //DrawerContent({}, {})
             }
         }
+    }
+}
+
+
+@Composable
+private fun SettingsItem() {
+    val context = LocalContext.current
+    Row(
+        modifier = Modifier
+            .height(56.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .clip(CircleShape)
+            .clickable(onClick = {
+                Log.d("SharkDebug", "Einstellungen geöffnet.")
+                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.settings.SettingsActivity::class.java)
+                context.startActivity(intent)
+            }),
+        verticalAlignment = CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = android.R.drawable.ic_menu_preferences),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+            contentDescription = "Settings"
+        )
+        Text(
+            text = "Settings",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = 12.dp)
+        )
     }
 }
 
