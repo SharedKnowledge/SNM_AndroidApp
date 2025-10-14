@@ -85,6 +85,12 @@ fun DrawerContent(
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         DrawerHeader()
         DividerItem()
+        //DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
+        //DrawerItemHeader("Settings")
+        CertificatesItem()
+        PersonsItem()
+        ConnectionItem()
+        DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
         DrawerItemHeader("Channels")
 //        SharkNetApp.getMessengerComponent()?.channelUris?.forEach { channelUri ->
 //            val channelName = channelUri.toString()
@@ -98,6 +104,7 @@ fun DrawerContent(
             }
         }
         DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
+        /*
         DrawerItemHeader("Persons")
         ProfileItem(
             "Ali Conors (you)", sharkMeProfile.photo,
@@ -111,10 +118,7 @@ fun DrawerContent(
         ) {
             onProfileClicked(sharkColleagueProfile.userId)
         }
-        // Add Settings section at the bottom
-        DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
-        DrawerItemHeader("Settings")
-        SettingsItem()
+         */
     }
 }
 
@@ -268,7 +272,7 @@ fun DrawerPreviewDark() {
 
 
 @Composable
-private fun SettingsItem() {
+private fun CertificatesItem() {
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -287,10 +291,10 @@ private fun SettingsItem() {
             painter = painterResource(id = android.R.drawable.ic_menu_preferences),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
-            contentDescription = "Settings"
+            contentDescription = "Certificates"
         )
         Text(
-            text = "Settings",
+            text = "Certificates",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 12.dp)
@@ -298,38 +302,63 @@ private fun SettingsItem() {
     }
 }
 
-//@Composable
-//private fun WidgetDiscoverability() {
-//    val context = LocalContext.current
-//    Row(
-//        modifier = Modifier
-//            .height(56.dp)
-//            .fillMaxWidth()
-//            .padding(horizontal = 12.dp)
-//            .clip(CircleShape)
-//            .clickable(onClick = {
-//                addWidgetToHomeScreen(context)
-//            }),
-//        verticalAlignment = CenterVertically
-//    ) {
-//        Text(
-//            stringResource(id = R.string.add_widget_to_home_page),
-//            style = MaterialTheme.typography.bodyMedium,
-//            color = MaterialTheme.colorScheme.onSurface,
-//            modifier = Modifier.padding(start = 12.dp)
-//        )
-//    }
-//}
-//
-//private fun addWidgetToHomeScreen(context: Context) {
-//    val appWidgetManager = AppWidgetManager.getInstance(context)
-//    val myProvider = ComponentName(context, WidgetReceiver::class.java)
-//    if (widgetAddingIsSupported(context)) {
-//        appWidgetManager.requestPinAppWidget(myProvider, null, null)
-//    }
-//}
-//
-//@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
-//private fun widgetAddingIsSupported(context: Context): Boolean {
-//    return AppWidgetManager.getInstance(context).isRequestPinAppWidgetSupported
-//}
+@Composable
+private fun PersonsItem() {
+    val context = LocalContext.current
+    Row(
+        modifier = Modifier
+            .height(56.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .clip(CircleShape)
+            .clickable(onClick = {
+                Log.d("SharkDebug", "Einstellungen geöffnet.")
+                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.settings.SettingsActivity::class.java)
+                context.startActivity(intent)
+            }),
+        verticalAlignment = CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = android.R.drawable.ic_menu_view),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+            contentDescription = "Persons"
+        )
+        Text(
+            text = "Persons",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = 12.dp)
+        )
+    }
+}
+@Composable
+private fun ConnectionItem() {
+    val context = LocalContext.current
+    Row(
+        modifier = Modifier
+            .height(56.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .clip(CircleShape)
+            .clickable(onClick = {
+                Log.d("SharkDebug", "Einstellungen geöffnet.")
+                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.settings.SettingsActivity::class.java)
+                context.startActivity(intent)
+            }),
+        verticalAlignment = CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = android.R.drawable.ic_menu_view),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+            contentDescription = "Connection"
+        )
+        Text(
+            text = "Connection",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = 12.dp)
+        )
+    }
+}
