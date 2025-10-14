@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SharkNetMessenger@Android</string>
+    <string name="emojis_label">Emojiler</string>
+    <string name="message">Mesaj</string>
+    <string name="dm_desc">Direkt Mesaj</string>
+    <string name="attach_file_desc">Dosya ekle</string>
+</resources>
