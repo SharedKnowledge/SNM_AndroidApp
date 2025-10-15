@@ -1,4 +1,4 @@
-package net.sharksystem.sharknetmessengerandroid.ui.certificates
+package net.sharksystem.sharknetmessengerandroid.ui.pki.certificates
 
 import android.util.Log
 import net.sharksystem.pki.SharkPKIComponent

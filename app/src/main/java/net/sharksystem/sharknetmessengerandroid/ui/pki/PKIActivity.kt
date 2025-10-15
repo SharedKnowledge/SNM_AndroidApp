@@ -1,4 +1,4 @@
-package net.sharksystem.sharknetmessengerandroid.ui.settings
+package net.sharksystem.sharknetmessengerandroid.ui.pki
 
 import android.os.Bundle
 import android.widget.Toast
@@ -55,17 +55,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.sharksystem.asap.persons.PersonValues
+import net.sharksystem.sharknetmessengerandroid.ui.pki.certificates.CertificatesActivity
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SettingsActivity : ComponentActivity() {
+class PKIActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SharkNetMessengerAndroidTheme {
-                SettingsScreen(
+                PKIScreen(
                     onBackPressed = { finish() }
                 )
             }
@@ -75,20 +76,20 @@ class SettingsActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+fun PKIScreen(
     onBackPressed: () -> Unit = {}
 ) {
-    var settingsState by remember { mutableStateOf<SettingsViewModel?>(null) }
+    var settingsState by remember { mutableStateOf<PKIViewModel?>(null) }
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        settingsState = SettingsViewModel()
+        settingsState = PKIViewModel()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text("Public Key Infrastructure") },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
                         Icon(
@@ -147,7 +148,7 @@ fun SettingsScreen(
 
 @Composable
 fun LoadingSection() {
-    SettingsCard(
+    PKICard(
         title = "Loading...",
         icon = Icons.Default.Refresh
     ) {
@@ -161,7 +162,7 @@ fun LoadingSection() {
 
 @Composable
 fun ErrorSection(errorMessage: String) {
-    SettingsCard(
+    PKICard(
         title = "Error",
         icon = Icons.Default.Security
     ) {
@@ -174,17 +175,17 @@ fun ErrorSection(errorMessage: String) {
 }
 
 @Composable
-fun GeneralSection(state: SettingsViewModel) {
-    SettingsCard(
+fun GeneralSection(state: PKIViewModel) {
+    PKICard(
         title = "General",
         icon = Icons.Default.Security
     ) {
-        SettingsItem("Owner Name", state.ownerName)
-        ClickableSettingsValue("Owner ID", state.ownerID.take(23) + "...", state.ownerID)
-        SettingsItem("Known Persons", state.numberOfPersons.toString())
-        SettingsItem("Total Certificates", state.totalCertificates.toString())
+        PKIItem("Owner Name", state.ownerName)
+        ClickablePKIValue("Owner ID", state.ownerID.take(23) + "...", state.ownerID)
+        PKIItem("Known Persons", state.numberOfPersons.toString())
+        PKIItem("Total Certificates", state.totalCertificates.toString())
         val keyAge = (System.currentTimeMillis() - state.keyCreationTime) / (1000 * 60 * 60 * 24)
-        SettingsItem("Key Age", "$keyAge days")
+        PKIItem("Key Age", "$keyAge days")
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -193,7 +194,7 @@ fun GeneralSection(state: SettingsViewModel) {
         if (state.keyCreationTime > 0) {
             val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
             val keyDate = dateFormat.format(Date(state.keyCreationTime))
-            SettingsItem("Key Created", keyDate)
+            PKIItem("Key Created", keyDate)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -294,10 +295,10 @@ fun GeneralSection(state: SettingsViewModel) {
 }
 
 @Composable
-fun PeersSection(state: SettingsViewModel) {
+fun PeersSection(state: PKIViewModel) {
     var peersToShow by remember { mutableIntStateOf(5) }
-
-    SettingsCard(
+/*
+    PKICard(
         title = "Peers",
         icon = Icons.Default.People
     ) {
@@ -450,14 +451,14 @@ fun PeersSection(state: SettingsViewModel) {
                 modifier = Modifier.padding(bottom = 4.dp)
             )
         }
-    }
+    }*/
 }
 
 @Preview
 @Composable
 fun PeersSectionPreview() {
     SharkNetMessengerAndroidTheme {
-        val mockState = object : SettingsViewModel() {
+        val mockState = object : PKIViewModel() {
             override fun getInitialGlobalSigningFailureRate(): Int = 3
 
             override fun getIdentityAssurance(personID: String?): Int {
@@ -509,8 +510,8 @@ fun PeersSectionPreview() {
 }
 
 @Composable
-fun CertificatesSection(state: SettingsViewModel) {
-    SettingsCard(
+fun CertificatesSection(state: PKIViewModel) {
+    PKICard(
         title = "Certificates",
         icon = Icons.Default.Security
     ) {
@@ -518,7 +519,7 @@ fun CertificatesSection(state: SettingsViewModel) {
         // Maybe combine General and Certificate section?
         val totalCerts = state.totalCertificates
         if (totalCerts > 0) {
-            SettingsItem("Total Certificates", totalCerts.toString())
+            PKIItem("Total Certificates", totalCerts.toString())
 
             val personsWithCerts = state.knownPersons.filter { person ->
                 val personId = person.userID?.toString() ?: ""
@@ -526,7 +527,7 @@ fun CertificatesSection(state: SettingsViewModel) {
                 certificates.isNotEmpty()
             }
 
-            SettingsItem("Persons with Certificates", personsWithCerts.size.toString())
+            PKIItem("Persons with Certificates", personsWithCerts.size.toString())
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -536,7 +537,7 @@ fun CertificatesSection(state: SettingsViewModel) {
             onClick = {
                 val intent = android.content.Intent(
                     context,
-                    net.sharksystem.sharknetmessengerandroid.ui.certificates.CertificatesActivity::class.java
+                    CertificatesActivity::class.java
                 )
                 context.startActivity(intent)
             },
@@ -550,7 +551,7 @@ fun CertificatesSection(state: SettingsViewModel) {
 }
 
 @Composable
-fun SettingsCard(
+fun PKICard(
     title: String,
     icon: ImageVector,
     content: @Composable () -> Unit
@@ -588,7 +589,7 @@ fun SettingsCard(
 }
 
 @Composable
-fun SettingsItem(
+fun PKIItem(
     label: String,
     value: String,
     color: Color = MaterialTheme.colorScheme.onSurface
@@ -614,7 +615,7 @@ fun SettingsItem(
 }
 
 @Composable
-fun ClickableSettingsValue(
+fun ClickablePKIValue(
     label: String,
     displayValue: String,
     fullValue: String,
@@ -650,8 +651,8 @@ fun ClickableSettingsValue(
 
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenErrorPreview() {
+fun PKIScreenErrorPreview() {
     SharkNetMessengerAndroidTheme {
-        SettingsScreen()
+        PKIScreen()
     }
 }

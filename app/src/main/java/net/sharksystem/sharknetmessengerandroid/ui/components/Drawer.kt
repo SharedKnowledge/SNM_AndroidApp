@@ -20,15 +20,9 @@
 
 package net.sharksystem.sharknetmessengerandroid.ui.components
 
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,14 +52,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.sharksystem.sharknetmessengerandroid.R
-import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp
 //import com.example.compose.jetchat.widget.WidgetReceiver
-import net.sharksystem.sharknetmessengerandroid.ui.data.sharkColleagueProfile
-import net.sharksystem.sharknetmessengerandroid.ui.data.sharkMeProfile
 import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroidTheme
 
 
@@ -87,7 +77,7 @@ fun DrawerContent(
         DividerItem()
         //DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
         //DrawerItemHeader("Settings")
-        CertificatesItem()
+        PKIItem()
         PersonsItem()
         ConnectionItem()
         DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
@@ -272,7 +262,7 @@ fun DrawerPreviewDark() {
 
 
 @Composable
-private fun CertificatesItem() {
+private fun PKIItem() {
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -282,7 +272,7 @@ private fun CertificatesItem() {
             .clip(CircleShape)
             .clickable(onClick = {
                 Log.d("SharkDebug", "Einstellungen geöffnet.")
-                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.settings.SettingsActivity::class.java)
+                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.pki.PKIActivity::class.java)
                 context.startActivity(intent)
             }),
         verticalAlignment = CenterVertically
@@ -291,10 +281,10 @@ private fun CertificatesItem() {
             painter = painterResource(id = android.R.drawable.ic_menu_preferences),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
-            contentDescription = "Certificates"
+            contentDescription = "PKI"
         )
         Text(
-            text = "Certificates",
+            text = "PKI",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 12.dp)
@@ -313,7 +303,7 @@ private fun PersonsItem() {
             .clip(CircleShape)
             .clickable(onClick = {
                 Log.d("SharkDebug", "Einstellungen geöffnet.")
-                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.settings.SettingsActivity::class.java)
+                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.pki.PKIActivity::class.java)
                 context.startActivity(intent)
             }),
         verticalAlignment = CenterVertically
@@ -343,7 +333,7 @@ private fun ConnectionItem() {
             .clip(CircleShape)
             .clickable(onClick = {
                 Log.d("SharkDebug", "Einstellungen geöffnet.")
-                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.settings.SettingsActivity::class.java)
+                val intent = Intent(context, net.sharksystem.sharknetmessengerandroid.ui.pki.PKIActivity::class.java)
                 context.startActivity(intent)
             }),
         verticalAlignment = CenterVertically

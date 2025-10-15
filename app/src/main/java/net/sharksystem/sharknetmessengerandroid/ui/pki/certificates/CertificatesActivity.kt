@@ -1,4 +1,4 @@
-package net.sharksystem.sharknetmessengerandroid.ui.certificates
+package net.sharksystem.sharknetmessengerandroid.ui.pki.certificates
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,6 +31,7 @@ import net.sharksystem.sharknetmessengerandroid.ui.theme.SharkNetMessengerAndroi
 import java.security.PublicKey
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class CertificatesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -682,7 +683,7 @@ private fun createMockCertificate(
         override fun getIssuerName(): CharSequence = issuerName
         override fun getValidSince(): Calendar {
             val cal = Calendar.getInstance()
-            cal.time = SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).parse(validSince)!!
+            cal.time = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).parse(validSince)!!
             return cal
         }
 

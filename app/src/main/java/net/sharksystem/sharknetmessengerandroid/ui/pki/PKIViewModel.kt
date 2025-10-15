@@ -1,4 +1,4 @@
-package net.sharksystem.sharknetmessengerandroid.ui.settings
+package net.sharksystem.sharknetmessengerandroid.ui.pki
 
 import android.util.Log
 import net.sharksystem.asap.persons.PersonValues
@@ -6,7 +6,7 @@ import net.sharksystem.asap.pki.ASAPCertificate
 import net.sharksystem.pki.SharkPKIComponent
 import net.sharksystem.sharknetmessengerandroid.sharknet.SharkNetApp.Companion.singleton
 
-open class SettingsViewModel {
+open class PKIViewModel {
     open var pkiComponent: SharkPKIComponent? = null
         protected set
     open var ownerName: String = ""

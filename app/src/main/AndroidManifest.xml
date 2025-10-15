@@ -34,10 +34,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name=".ui.pki.PKIActivity"
             android:exported="false">
         </activity>
-        <activity android:name=".ui.certificates.CertificatesActivity"
+        <activity android:name=".ui.pki.certificates.CertificatesActivity"
             android:exported="false">
         </activity>
     </application>
