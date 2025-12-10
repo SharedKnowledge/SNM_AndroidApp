@@ -205,7 +205,6 @@ fun UserInput(
             )
 
             UserInputSelector(
-
                 onSelectorChange = { selector ->
                     if (selector == InputSelector.ENCRYPTED) {
                         encrypted = !encrypted

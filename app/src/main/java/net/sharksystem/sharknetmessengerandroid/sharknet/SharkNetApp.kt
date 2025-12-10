@@ -73,9 +73,9 @@ class SharkNetApp {
             }
         }
 
-        fun getMessengerComponent() : SharkNetMessengerComponentImpl? {
+        fun getMessengerComponent() : SharkNetMessengerComponent? {
             return (singleton!!.getPeer().getComponent(SharkNetMessengerComponent::class.java)
-                    as? SharkNetMessengerComponentImpl)
+                    as? SharkNetMessengerComponent)
         }
 
         fun getPeerName(peerID: CharSequence) : String {
